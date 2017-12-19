@@ -234,6 +234,9 @@ class YaSql
                     }
                 }
 
+                /*
+                 * Store
+                 */
                 $tables[$table][$column] = $query;
             }
 
@@ -255,6 +258,9 @@ class YaSql
             }
         }
 
+        /*
+         * Update data and store
+         */
         $data['tables'] = $tables;
         unset($data['composite'], $data['definitions']);
         $data['indexes'] = $indexes;
@@ -315,6 +321,9 @@ class YaSql
         ];
 
         foreach ($this->data['tables'] as $table => $columns) {
+            /*
+             * Add Table
+             */
             $count = count($columns);
             foreach ($columns as $column => $query) {
                 $columns[$column] = $in . '`' . $column . '` ' . $query;
@@ -329,6 +338,9 @@ class YaSql
                 [');', '']
             );
 
+            /*
+             * Add Indexes
+             */
             $index = $this->data['indexes'][$table] ?? [];
             if (!empty($index)) {
                 $id = [];
