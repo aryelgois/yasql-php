@@ -328,6 +328,36 @@ class YaSql
                 $columns,
                 [');', '']
             );
+
+            $index = $this->data['indexes'][$table] ?? [];
+            if (!empty($index)) {
+                $id = [];
+                foreach ($index as $key => $value) {
+                    switch ($key) {
+                        case 'PRIMARY':
+                            $id[] = $in . 'ADD PRIMARY KEY (`'
+                                . implode('`, `', $value) . '`)';
+                            break;
+
+                        case 'UNIQUE':
+                            foreach ($value as $v) {
+                                $id[] = $in . 'ADD UNIQUE KEY (`'
+                                    . implode('`, `', $v) . '`)';
+                            }
+                            break;
+                    }
+                }
+                $count = count($id);
+                foreach ($id as $i => $v) {
+                    $id[$i] = $v . (--$count > 0 ? ',' : ';');
+                }
+                $indexes = array_merge(
+                    $indexes,
+                    ['ALTER TABLE `' . $table . '`'],
+                    $id,
+                    ['']
+                );
+            }
         }
 
         $sql = array_merge(
