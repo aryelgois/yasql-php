@@ -332,7 +332,7 @@ class YaSql
             $tables = array_merge(
                 $tables,
                 ['CREATE TABLE `' . $table . '` ('],
-                self::arrayAppendLast($columns, '', ','),
+                array_values(self::arrayAppendLast($columns, '', ',')),
                 [');', '']
             );
 
