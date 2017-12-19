@@ -74,6 +74,7 @@ class YaSql
      * @throws \DomainException          Unknown index
      * @throws \LogicException           Duplicated composite for single key
      * @throws \RuntimeException         Syntax error in Foreign Key
+     * @throws \LogicException           Multiple AUTO_INCREMENT indexes
      * @throws \LengthException          Column is empty
      * @throws \LogicException           Multiple PRIMARY KEY index
      */
@@ -152,6 +153,7 @@ class YaSql
          */
         $tables = $data['tables'] ?? [];
         $definitions = $data['definitions'] ?? [];
+        $auto_increment = [];
         $foreigns = [];
         $flag = PREG_OFFSET_CAPTURE;
         foreach ($tables as $table => $columns) {
@@ -191,6 +193,18 @@ class YaSql
                 /*
                  * Extract indexes
                  */
+                $p = '/ ?AUTO_INCREMENT ?/i';
+                if (preg_match($p, $query, $matches, $flag)) {
+                    $m = $matches[0];
+                    $query = substr_replace($query, ' ', $m[1], strlen($m[0]));
+                    if (isset($auto_increment[$table])) {
+                        $message = 'Multiple AUTO_INCREMENT on table "'
+                            . $table . '"';
+                        throw new \LogicException($message);
+                    }
+                    $auto_increment[$table] = $column;
+                }
+
                 $p = '/ ?PRIMARY( KEY|) ?/i';
                 if (preg_match($p, $query, $matches, $flag)) {
                     $m = $matches[0];
@@ -265,6 +279,7 @@ class YaSql
          */
         $data['tables'] = $tables;
         unset($data['composite'], $data['definitions']);
+        $data['auto_increment'] = $auto_increment;
         $data['indexes'] = $indexes;
         $data['foreigns'] = $foreigns;
 
@@ -304,6 +319,13 @@ class YaSql
         $tables = [
             '--',
             '-- Tables',
+            '--',
+            '',
+        ];
+
+        $auto_increments = [
+            '--',
+            '-- AUTO_INCREMENT',
             '--',
             '',
         ];
@@ -385,10 +407,26 @@ class YaSql
             }
         }
 
+        /*
+         * Add AUTO_INCREMENT
+         */
+        foreach ($this->data['auto_increment'] ?? [] as $table => $column) {
+            $auto_increments = array_merge(
+                $auto_increments,
+                [
+                    'ALTER TABLE `' . $table . '`',
+                    $in . 'MODIFY `' . $column . '` ' .
+                    $this->data['tables'][$table][$column] . ' AUTO_INCREMENT;',
+                    ''
+                ]
+            );
+        }
+
         $sql = array_merge(
             $sql,
             $tables,
             $indexes,
+            $auto_increments,
             $foreigns
         );
 
