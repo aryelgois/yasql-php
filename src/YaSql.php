@@ -355,7 +355,10 @@ class YaSql
                 $tables,
                 ['CREATE TABLE `' . $table . '` ('],
                 array_values(self::arrayAppendLast($columns, '', ',')),
-                [');', '']
+                [
+                    ') CHARACTER SET ' . ($db['charset'] ?? 'utf8') . ';',
+                    ''
+                ]
             );
 
             /*
