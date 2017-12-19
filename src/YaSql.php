@@ -372,6 +372,29 @@ class YaSql
                     ['']
                 );
             }
+
+            /*
+             * Add Foreigns
+             */
+            $foreign_list = $this->data['foreigns'][$table] ?? [];
+            if (!empty($foreign_list)) {
+                $f = [];
+                foreach ($foreign_list as $column => $foreign) {
+                    $f[] = $in . 'ADD FOREIGN KEY (`' . $column . '`) '
+                        . 'REFERENCES `' . $foreign[0]
+                        . '` (`' . $foreign[1] . '`)';
+                }
+                $count = count($f);
+                foreach ($f as $i => $v) {
+                    $f[$i] = $v . (--$count > 0 ? ',' : ';');
+                }
+                $foreigns = array_merge(
+                    $foreigns,
+                    ['ALTER TABLE `' . $table . '`'],
+                    $f,
+                    ['']
+                );
+            }
         }
 
         $sql = array_merge(
