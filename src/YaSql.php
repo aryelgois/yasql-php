@@ -326,17 +326,13 @@ class YaSql
             /*
              * Add Table
              */
-            $count = count($columns);
             foreach ($columns as $column => $query) {
                 $columns[$column] = $in . '`' . $column . '` ' . $query;
-                if (--$count > 0) {
-                    $columns[$column] .= ',';
-                }
             }
             $tables = array_merge(
                 $tables,
                 ['CREATE TABLE `' . $table . '` ('],
-                $columns,
+                self::arrayAppendLast($columns, '', ','),
                 [');', '']
             );
 
@@ -361,14 +357,10 @@ class YaSql
                             break;
                     }
                 }
-                $count = count($id);
-                foreach ($id as $i => $v) {
-                    $id[$i] = $v . (--$count > 0 ? ',' : ';');
-                }
                 $indexes = array_merge(
                     $indexes,
                     ['ALTER TABLE `' . $table . '`'],
-                    $id,
+                    self::arrayAppendLast($id, ';', ','),
                     ['']
                 );
             }
@@ -384,14 +376,10 @@ class YaSql
                         . 'REFERENCES `' . $foreign[0]
                         . '` (`' . $foreign[1] . '`)';
                 }
-                $count = count($f);
-                foreach ($f as $i => $v) {
-                    $f[$i] = $v . (--$count > 0 ? ',' : ';');
-                }
                 $foreigns = array_merge(
                     $foreigns,
                     ['ALTER TABLE `' . $table . '`'],
-                    $f,
+                    self::arrayAppendLast($f, ';', ','),
                     ['']
                 );
             }
@@ -426,5 +414,23 @@ class YaSql
             }
         }
         return false;
+    }
+
+    /**
+     * Appends a string to the last item in an array
+     *
+     * Optionally, appends a string to the other items
+     *
+     * @param string[] $array  Array to receive data
+     * @param string   $last   Appended to the last item
+     * @param string   $others Appended to the other items
+     */
+    protected static function arrayAppendLast($array, $last, $others = '')
+    {
+        $count = count($array);
+        foreach ($array as $key => $value) {
+            $array[$key] = $value . (--$count > 0 ? $others : $last);
+        }
+        return $array;
     }
 }
