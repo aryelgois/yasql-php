@@ -7,4 +7,4 @@ $database = file_get_contents(__DIR__ . '/database.yml');
 
 $yasql = new aryelgois\YaSql\YaSql($database);
 
-var_dump($yasql);
+echo $yasql->output();

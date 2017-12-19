@@ -44,6 +44,13 @@ class YaSql
     protected $data;
 
     /**
+     * How many spaces per indentation level
+     *
+     * @var int
+     */
+    public $indentation = 2;
+
+    /**
      * Parses a string following YAML Ain't SQL specifications
      *
      * @param string $yaml Contains a database description
@@ -169,6 +176,83 @@ class YaSql
         $data['foreigns'] = $foreigns;
 
         $this->data = $data;
+    }
+
+    /**
+     * Outputs SQL commands to create the database
+     *
+     * @return string
+     */
+    public function output()
+    {
+        $in = $this->indentation;
+        if (!is_integer($in) || $in < 0) {
+            $in = 2;
+        }
+        $in = str_repeat(' ', $in);
+
+        $db = $this->data['database'];
+
+        $sql = [
+            '-- PHP YASQL output',
+            '-- https://github.com/aryelgois/yasql-php',
+            '--',
+            '-- Timestamp: ' . date('c'),
+            '-- PHP version: ' . phpversion(),
+            '',
+            'CREATE DATABASE IF NOT EXISTS `' . $db['name'] . '`',
+            $in . 'CHARACTER SET ' . ($db['charset'] ?? 'utf8'),
+            $in . 'COLLATE ' . ($db['collate'] ?? 'utf8_general_ci') . ';',
+            '',
+            'USE `' . $db['name'] . '`;',
+            '',
+        ];
+
+        $tables = [
+            '--',
+            '-- Tables',
+            '--',
+            '',
+        ];
+
+        $indexes = [
+            '--',
+            '-- Indexes',
+            '--',
+            '',
+        ];
+
+        $foreigns = [
+            '--',
+            '-- Foreigns',
+            '--',
+            '',
+        ];
+
+        foreach ($this->data['tables'] as $table => $columns) {
+            $count = count($columns);
+            foreach ($columns as $column => $query) {
+                $columns[$column] = $in . '`' . $column . '` ' . $query;
+                if (--$count > 0) {
+                    $columns[$column] .= ',';
+                }
+            }
+            $tables = array_merge(
+                $tables,
+                ['CREATE TABLE `' . $table . '` ('],
+                $columns,
+                [');', '']
+            );
+        }
+
+        $sql = array_merge(
+            $sql,
+            $tables,
+            $indexes,
+            $foreigns
+        );
+
+        return implode("\n", $sql) . "\n";
     }
 
     /**
