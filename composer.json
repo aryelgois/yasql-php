@@ -9,5 +9,13 @@
             "role": "Developer"
         }
     ],
-    "require": {}
+    "require": {
+        "php": "^7.0",
+        "symfony/yaml": "^3.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "aryelgois\\YaSql\\": "src/"
+        }
+    }
 }
