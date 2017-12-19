@@ -18,6 +18,25 @@ use Symfony\Component\Yaml\Yaml;
 class YaSql
 {
     /**
+     * Types which receive the UNSIGNED attribute
+     *
+     * @const string[]
+     */
+    const NUMERIC_TYPES = [
+        'tinyint',
+        'smallint',
+        'mediumint',
+        'int',
+        'integer',
+        'bigint',
+        'real',
+        'double',
+        'float',
+        'decimal',
+        'numeric',
+    ];
+
+    /**
      * The parsed YAML with a database description
      *
      * @var array
@@ -33,6 +52,7 @@ class YaSql
      * @throws \RuntimeException         Missing Database name
      * @throws \DomainException          Unsupported source
      * @throws \RuntimeException         Syntax error in Foreign Key
+     * @throws \LengthException          Column is empty
      */
     public function __construct($yaml)
     {
@@ -110,6 +130,36 @@ class YaSql
                     $foreigns[$table_name][$column_name] = $matches;
                 }
 
+                /*
+                 * Validation
+                 */
+                $column = trim($column);
+                if (strlen($column) == 0) {
+                    throw new \LengthException('Column is empty');
+                }
+
+                /*
+                 * Defaults
+                 */
+                $sign = strpos($column, '+');
+                if ($sign === false) {
+                    if (self::strContains($column, self::NUMERIC_TYPES)) {
+                        if (stripos($column, 'UNSIGNED') === false) {
+                            $column .= ' UNSIGNED';
+                        }
+                    }
+                } else {
+                    $column = substr_replace($column, '', $sign, 1);
+                }
+
+                if (stripos($column, 'NOT NULL') === false) {
+                    if (stripos($column, 'NULL') === false) {
+                        $column .= ' NOT NULL';
+                    } else {
+                        $column = str_replace('NULLABLE', 'NULL', $column);
+                    }
+                }
+
                 $tables[$table_name][$column_name] = $column;
             }
         }
@@ -119,5 +169,26 @@ class YaSql
         $data['foreigns'] = $foreigns;
 
         $this->data = $data;
+    }
+
+    /**
+     * Tells if a string contains any items in an array (case insensitive)
+     *
+     * @author zombat
+     * @link https://stackoverflow.com/a/2124557
+     *
+     * @param string $str A string to be tested
+     * @param array  $arr List of substrings that could be in $str
+     *
+     * @return bool
+     */
+    protected static function strContains($str, array $arr)
+    {
+        foreach ($arr as $a) {
+            if (stripos($str, $a) !== false) {
+                return true;
+            }
+        }
+        return false;
     }
 }
