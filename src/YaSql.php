@@ -364,20 +364,20 @@ class YaSql
             /*
              * Add Indexes
              */
-            $index = $this->data['indexes'][$table] ?? [];
-            if (!empty($index)) {
+            $index_list = $this->data['indexes'][$table] ?? [];
+            if (!empty($index_list)) {
                 $id = [];
-                foreach ($index as $key => $value) {
+                foreach ($index_list as $key => $index) {
                     switch ($key) {
                         case 'PRIMARY':
                             $id[] = $in . 'ADD PRIMARY KEY (`'
-                                . implode('`, `', $value) . '`)';
+                                . implode('`, `', $index) . '`)';
                             break;
 
                         case 'UNIQUE':
-                            foreach ($value as $v) {
+                            foreach ($index as $column) {
                                 $id[] = $in . 'ADD UNIQUE KEY (`'
-                                    . implode('`, `', $v) . '`)';
+                                    . implode('`, `', $column) . '`)';
                             }
                             break;
                     }
