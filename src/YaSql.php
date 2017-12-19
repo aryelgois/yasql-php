@@ -209,7 +209,9 @@ class YaSql
                  */
                 $query = trim($query);
                 if (strlen($query) == 0) {
-                    throw new \LengthException('Column is empty');
+                    $message = 'Column "' . $table . '.' . $column
+                        . '" is empty';
+                    throw new \LengthException($message);
                 }
 
                 /*
