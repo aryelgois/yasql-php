@@ -97,16 +97,16 @@ class YaSql
         $tables = $data['tables'] ?? [];
         $definitions = $data['definitions'] ?? [];
         $foreigns = [];
-        foreach ($tables as $table_name => $columns) {
-            foreach ($columns as $column_name => $column) {
+        foreach ($tables as $table => $columns) {
+            foreach ($columns as $column => $query) {
                 /*
                  * Expand definitions
                  */
                 if (!empty($definitions)) {
-                    while ($tokens = explode(' ', $column)) {
+                    while ($tokens = explode(' ', $query)) {
                         if (array_key_exists($tokens[0], $definitions)) {
                             $tokens[0] = $definitions[$tokens[0]];
-                            $column = implode(' ', $tokens);
+                            $query = implode(' ', $tokens);
                         } else {
                             break;
                         }
@@ -116,51 +116,51 @@ class YaSql
                 /*
                  * Extract Foreign Key
                  */
-                $fk = strpos($column, '->');
+                $fk = strpos($query, '->');
                 if ($fk !== false) {
-                    preg_match($pattern, substr($column, $fk), $matches);
+                    preg_match($pattern, substr($query, $fk), $matches);
                     if (empty($matches)) {
                         $mesage = 'Syntax error in Foreign Key on column "'
-                            . $table_name . '.' . $column_name . '"';
+                            . $table . '.' . $column . '"';
                         throw new \RuntimeException($mesage);
                     }
                     $len = strlen($matches[0]);
-                    $column = substr_replace($column, '', $fk, $len);
+                    $query = substr_replace($query, '', $fk, $len);
                     $matches = array_slice($matches, -2, 2);
-                    $foreigns[$table_name][$column_name] = $matches;
+                    $foreigns[$table][$column] = $matches;
                 }
 
                 /*
                  * Validation
                  */
-                $column = trim($column);
-                if (strlen($column) == 0) {
+                $query = trim($query);
+                if (strlen($query) == 0) {
                     throw new \LengthException('Column is empty');
                 }
 
                 /*
                  * Defaults
                  */
-                $sign = strpos($column, '+');
+                $sign = strpos($query, '+');
                 if ($sign === false) {
-                    if (self::strContains($column, self::NUMERIC_TYPES)) {
-                        if (stripos($column, 'UNSIGNED') === false) {
-                            $column .= ' UNSIGNED';
+                    if (self::strContains($query, self::NUMERIC_TYPES)) {
+                        if (stripos($query, 'UNSIGNED') === false) {
+                            $query .= ' UNSIGNED';
                         }
                     }
                 } else {
-                    $column = substr_replace($column, '', $sign, 1);
+                    $query = substr_replace($query, '', $sign, 1);
                 }
 
-                if (stripos($column, 'NOT NULL') === false) {
-                    if (stripos($column, 'NULL') === false) {
-                        $column .= ' NOT NULL';
+                if (stripos($query, 'NOT NULL') === false) {
+                    if (stripos($query, 'NULL') === false) {
+                        $query .= ' NOT NULL';
                     } else {
-                        $column = str_replace('NULLABLE', 'NULL', $column);
+                        $query = str_replace('NULLABLE', 'NULL', $query);
                     }
                 }
 
-                $tables[$table_name][$column_name] = $column;
+                $tables[$table][$column] = $query;
             }
         }
 
