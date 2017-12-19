@@ -18,6 +18,19 @@ use Symfony\Component\Yaml\Yaml;
 class YaSql
 {
     /**
+     * Set of Index keywords
+     *
+     * The value determines if a table can have one or more indexes
+     *
+     * @var string
+     */
+    const INDEX_KEYWORDS = [
+        //'FOREIGN' => 'multiple',
+        'PRIMARY' => 'single',
+        'UNIQUE' => 'multiple',
+    ];
+
+    /**
      * Types which receive the UNSIGNED attribute
      *
      * @const string[]
@@ -58,8 +71,11 @@ class YaSql
      * @throws \InvalidArgumentException $yaml is not a mapping
      * @throws \RuntimeException         Missing Database name
      * @throws \DomainException          Unsupported source
+     * @throws \DomainException          Unknown index
+     * @throws \LogicException           Duplicated composite for single key
      * @throws \RuntimeException         Syntax error in Foreign Key
      * @throws \LengthException          Column is empty
+     * @throws \LogicException           Multiple PRIMARY KEY index
      */
     public function __construct($yaml)
     {
@@ -99,12 +115,47 @@ class YaSql
             . ')/';
 
         /*
+         * Expand composite
+         */
+        $indexes = [];
+        $keywords = self::INDEX_KEYWORDS;
+        foreach ($data['composite'] ?? [] as $composite) {
+            $tokens = explode(' ', $composite);
+            if ($tokens[1] == 'KEY') {
+                unset($tokens[1]);
+                $tokens = array_values($tokens);
+            }
+
+            $key = strtoupper($tokens[0]);
+            if (!array_key_exists($key, $keywords)) {
+                throw new \DomainException('Unknown index "' . $key . '"');
+            }
+
+            $table = $tokens[1];
+            if ($keywords[$key] == 'single' && isset($indexes[$table][$key])) {
+                $message = 'Duplicated composite for single key on table "'
+                    . $table . '"';
+                throw new \LogicException($message);
+            }
+
+            $columns = array_slice($tokens, 2);
+
+            if ($keywords[$key] == 'multiple') {
+                $indexes[$table][$key][] = $columns;
+            } else {
+                $indexes[$table][$key] = $columns;
+            }
+        }
+
+        /*
          * Loop through each column
          */
         $tables = $data['tables'] ?? [];
         $definitions = $data['definitions'] ?? [];
         $foreigns = [];
+        $flag = PREG_OFFSET_CAPTURE;
         foreach ($tables as $table => $columns) {
+            $primary_key = [];
             foreach ($columns as $column => $query) {
                 /*
                  * Expand definitions
@@ -135,6 +186,22 @@ class YaSql
                     $query = substr_replace($query, '', $fk, $len);
                     $matches = array_slice($matches, -2, 2);
                     $foreigns[$table][$column] = $matches;
+                }
+
+                /*
+                 * Extract indexes
+                 */
+                $p = '/ ?PRIMARY( KEY|) ?/i';
+                if (preg_match($p, $query, $matches, $flag)) {
+                    $m = $matches[0];
+                    $query = substr_replace($query, ' ', $m[1], strlen($m[0]));
+                    $primary_key[] = $column;
+                }
+
+                if (preg_match('/ ?UNIQUE ?/i', $query, $matches, $flag)) {
+                    $m = $matches[0];
+                    $query = substr_replace($query, ' ', $m[1], strlen($m[0]));
+                    $indexes[$table]['UNIQUE'][] = [$column];
                 }
 
                 /*
@@ -169,10 +236,28 @@ class YaSql
 
                 $tables[$table][$column] = $query;
             }
+
+            /*
+             * Add PRIMARY KEY
+             *
+             * If multiple columns have this attribute, it will be a composite.
+             * PHP has ordered associative arrays, so it will be in the same
+             * order as in the YAML. Other languages might produce a composite
+             * in another order
+             */
+            if (!empty($primary_key)) {
+                if (isset($indexes[$table]['PRIMARY'])) {
+                    $message = 'Multiple PRIMARY KEY on table "' . $table . '"';
+                    throw new \LogicException($message);
+                } else {
+                    $indexes[$table]['PRIMARY'] = $primary_key;
+                }
+            }
         }
 
         $data['tables'] = $tables;
-        unset($data['definitions']);
+        unset($data['composite'], $data['definitions']);
+        $data['indexes'] = $indexes;
         $data['foreigns'] = $foreigns;
 
         $this->data = $data;
