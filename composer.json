@@ -1,0 +1,13 @@
+{
+    "name": "aryelgois/yasql-php",
+    "description": "A PHP implementation for YAML Ain't SQL",
+    "keywords": ["PHP", "YAML", "SQL", "database", "schema"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Aryel Mota Góis",
+            "role": "Developer"
+        }
+    ],
+    "require": {}
+}
