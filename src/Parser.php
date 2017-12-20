@@ -12,10 +12,12 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * Create SQL database schemas with YAML
  *
+ * Controller class to simplify the package usage
+ *
  * @author Aryel Mota Góis
  * @license MIT
  */
-class YaSql
+class Parser
 {
     /**
      * Set of Index keywords
@@ -56,18 +58,11 @@ class YaSql
     protected $data;
 
     /**
-     * How many spaces per indentation level
+     * Creates a new Parser object
      *
-     * @var int
-     */
-    public $indentation = 2;
-
-    /**
-     * Parses a string following YAML Ain't SQL specifications
+     * @param string $yasql A string following YAML Ain't SQL specifications
      *
-     * @param string $yaml Contains a database description
-     *
-     * @throws \InvalidArgumentException $yaml is not a mapping
+     * @throws \InvalidArgumentException $yasql is not a mapping
      * @throws \RuntimeException         Missing Database name
      * @throws \DomainException          Unsupported source
      * @throws \DomainException          Unknown index
@@ -77,9 +72,9 @@ class YaSql
      * @throws \LengthException          Column is empty
      * @throws \LogicException           Multiple PRIMARY KEY indexes
      */
-    public function __construct($yaml)
+    public function __construct(string $yasql)
     {
-        $data = Yaml::parse($yaml);
+        $data = Yaml::parse($yasql);
 
         if (!is_array($data)) {
             throw new \InvalidArgumentException('YASQL must be a mapping');
@@ -283,171 +278,33 @@ class YaSql
     }
 
     /**
-     * Outputs SQL commands to create the database
+     * Extracts a keyword from a string
      *
-     * @return string
+     * @param string $haystack String to look for the keyword
+     * @param string $needle   PCRE subpattern with the keyword (insensitive)
+     *
+     * @return false  If the keyword was not found
+     * @return string The string without the keyword
      */
-    public function output()
+    protected static function extractKeyword(string $haystack, string $needle)
     {
-        $in = $this->indentation;
-        if (!is_integer($in) || $in < 0) {
-            $in = 2;
+        $pattern = '/ ?' . $needle . ' ?/i';
+        if (preg_match($pattern, $haystack, $matches, PREG_OFFSET_CAPTURE)) {
+            $m = $matches[0];
+            $haystack = substr_replace($haystack, ' ', $m[1], strlen($m[0]));
+            return $haystack;
         }
-        $in = str_repeat(' ', $in);
+        return false;
+    }
 
-        $db = $this->data['database'];
-
-        /*
-         * Generate Header
-         */
-        $sql = [
-            '-- Generated with yasql-php',
-            '-- https://github.com/aryelgois/yasql-php',
-            '--',
-            '-- Timestamp: ' . date('c'),
-            '-- PHP version: ' . phpversion(),
-        ];
-
-        $header = array_filter([
-            'Project'     => $db['project'] ?? '',
-            'Description' => $db['description'] ?? '',
-            'Version'     => $db['version'] ?? '',
-            'License'     => $db['license'] ?? '',
-            'Authors'     => implode(
-                "\n--          ",
-                (array) ($db['authors'] ?? '')
-            ),
-        ]);
-        if (!empty($header)) {
-            array_walk($header, function (&$v, $k) {
-                $v = '-- ' . $k . ': ' . $v;
-            });
-            array_unshift($header, '--');
-        }
-
-        $sql = array_merge($sql, array_values($header), [
-            '',
-            'CREATE DATABASE IF NOT EXISTS `' . $db['name'] . '`',
-            $in . 'CHARACTER SET ' . ($db['charset'] ?? 'utf8'),
-            $in . 'COLLATE ' . ($db['collate'] ?? 'utf8_general_ci') . ';',
-            '',
-            'USE `' . $db['name'] . '`;',
-            '',
-        ]);
-
-        /*
-         * Generate SQL
-         */
-        foreach ($this->data['tables'] as $table => $columns) {
-            /*
-             * Add Table
-             */
-            foreach ($columns as $column => $query) {
-                $columns[$column] = $in . '`' . $column . '` ' . $query;
-            }
-            $tables = array_merge(
-                $tables ?? [
-                    '--',
-                    '-- Tables',
-                    '--',
-                    '',
-                ],
-                ['CREATE TABLE `' . $table . '` ('],
-                array_values(self::arrayAppendLast($columns, '', ',')),
-                [
-                    ') CHARACTER SET ' . ($db['charset'] ?? 'utf8') . ';',
-                    ''
-                ]
-            );
-
-            /*
-             * Add Indexes
-             */
-            $index_list = $this->data['indexes'][$table] ?? [];
-            if (!empty($index_list)) {
-                $id = [];
-                foreach ($index_list as $key => $index) {
-                    switch ($key) {
-                        case 'PRIMARY':
-                            $id[] = $in . 'ADD PRIMARY KEY (`'
-                                . implode('`, `', $index) . '`)';
-                            break;
-
-                        case 'UNIQUE':
-                            foreach ($index as $column) {
-                                $id[] = $in . 'ADD UNIQUE KEY (`'
-                                    . implode('`, `', $column) . '`)';
-                            }
-                            break;
-                    }
-                }
-                $indexes = array_merge(
-                    $indexes ?? [
-                        '--',
-                        '-- Indexes',
-                        '--',
-                        '',
-                    ],
-                    ['ALTER TABLE `' . $table . '`'],
-                    self::arrayAppendLast($id, ';', ','),
-                    ['']
-                );
-            }
-
-            /*
-             * Add Foreigns
-             */
-            $foreign_list = $this->data['foreigns'][$table] ?? [];
-            if (!empty($foreign_list)) {
-                $f = [];
-                foreach ($foreign_list as $column => $foreign) {
-                    $f[] = $in . 'ADD FOREIGN KEY (`' . $column . '`) '
-                        . 'REFERENCES `' . $foreign[0]
-                        . '` (`' . $foreign[1] . '`)';
-                }
-                $foreigns = array_merge(
-                    $foreigns ?? [
-                        '--',
-                        '-- Foreigns',
-                        '--',
-                        '',
-                    ],
-                    ['ALTER TABLE `' . $table . '`'],
-                    self::arrayAppendLast($f, ';', ','),
-                    ['']
-                );
-            }
-        }
-
-        /*
-         * Add AUTO_INCREMENT
-         */
-        foreach ($this->data['auto_increment'] ?? [] as $table => $column) {
-            $auto_increments = array_merge(
-                $auto_increments ?? [
-                    '--',
-                    '-- AUTO_INCREMENT',
-                    '--',
-                    '',
-                ],
-                [
-                    'ALTER TABLE `' . $table . '`',
-                    $in . 'MODIFY `' . $column . '` ' .
-                    $this->data['tables'][$table][$column] . ' AUTO_INCREMENT;',
-                    ''
-                ]
-            );
-        }
-
-        $sql = array_merge(
-            $sql,
-            $tables ?? [],
-            $indexes ?? [],
-            $auto_increments ?? [],
-            $foreigns ?? []
-        );
-
-        return implode("\n", $sql);
+    /**
+     * Returns the parsed data
+     *
+     * @return array
+     */
+    public function getData()
+    {
+        return $this->data;
     }
 
     /**
@@ -467,44 +324,6 @@ class YaSql
             if (stripos($str, $a) !== false) {
                 return true;
             }
-        }
-        return false;
-    }
-
-    /**
-     * Appends a string to the last item in an array
-     *
-     * Optionally, appends a string to the other items
-     *
-     * @param string[] $array  Array to receive data
-     * @param string   $last   Appended to the last item
-     * @param string   $others Appended to the other items
-     */
-    protected static function arrayAppendLast($array, $last, $others = '')
-    {
-        $count = count($array);
-        foreach ($array as $key => $value) {
-            $array[$key] = $value . (--$count > 0 ? $others : $last);
-        }
-        return $array;
-    }
-
-    /**
-     * Extracts a keyword from a string
-     *
-     * @param string $haystack String to look for the keyword
-     * @param string $needle   PCRE subpattern with the keyword (insensitive)
-     *
-     * @return false  If the keyword was not found
-     * @return string The string without the keyword
-     */
-    protected static function extractKeyword(string $haystack, string $needle)
-    {
-        $pattern = '/ ?' . $needle . ' ?/i';
-        if (preg_match($pattern, $haystack, $matches, PREG_OFFSET_CAPTURE)) {
-            $m = $matches[0];
-            $haystack = substr_replace($haystack, ' ', $m[1], strlen($m[0]));
-            return $haystack;
         }
         return false;
     }
