@@ -316,34 +316,6 @@ class YaSql
             '',
         ];
 
-        $tables = [
-            '--',
-            '-- Tables',
-            '--',
-            '',
-        ];
-
-        $auto_increments = [
-            '--',
-            '-- AUTO_INCREMENT',
-            '--',
-            '',
-        ];
-
-        $indexes = [
-            '--',
-            '-- Indexes',
-            '--',
-            '',
-        ];
-
-        $foreigns = [
-            '--',
-            '-- Foreigns',
-            '--',
-            '',
-        ];
-
         foreach ($this->data['tables'] as $table => $columns) {
             /*
              * Add Table
@@ -352,7 +324,12 @@ class YaSql
                 $columns[$column] = $in . '`' . $column . '` ' . $query;
             }
             $tables = array_merge(
-                $tables,
+                $tables ?? [
+                    '--',
+                    '-- Tables',
+                    '--',
+                    '',
+                ],
                 ['CREATE TABLE `' . $table . '` ('],
                 array_values(self::arrayAppendLast($columns, '', ',')),
                 [
@@ -383,7 +360,12 @@ class YaSql
                     }
                 }
                 $indexes = array_merge(
-                    $indexes,
+                    $indexes ?? [
+                        '--',
+                        '-- Indexes',
+                        '--',
+                        '',
+                    ],
                     ['ALTER TABLE `' . $table . '`'],
                     self::arrayAppendLast($id, ';', ','),
                     ['']
@@ -402,7 +384,12 @@ class YaSql
                         . '` (`' . $foreign[1] . '`)';
                 }
                 $foreigns = array_merge(
-                    $foreigns,
+                    $foreigns ?? [
+                        '--',
+                        '-- Foreigns',
+                        '--',
+                        '',
+                    ],
                     ['ALTER TABLE `' . $table . '`'],
                     self::arrayAppendLast($f, ';', ','),
                     ['']
@@ -415,7 +402,12 @@ class YaSql
          */
         foreach ($this->data['auto_increment'] ?? [] as $table => $column) {
             $auto_increments = array_merge(
-                $auto_increments,
+                $auto_increments ?? [
+                    '--',
+                    '-- AUTO_INCREMENT',
+                    '--',
+                    '',
+                ],
                 [
                     'ALTER TABLE `' . $table . '`',
                     $in . 'MODIFY `' . $column . '` ' .
@@ -427,10 +419,10 @@ class YaSql
 
         $sql = array_merge(
             $sql,
-            $tables,
-            $indexes,
-            $auto_increments,
-            $foreigns
+            $tables ?? [],
+            $indexes ?? [],
+            $auto_increments ?? [],
+            $foreigns ?? []
         );
 
         return implode("\n", $sql) . "\n";
