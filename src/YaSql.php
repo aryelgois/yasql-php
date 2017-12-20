@@ -422,7 +422,7 @@ class YaSql
             $foreigns ?? []
         );
 
-        return implode("\n", $sql) . "\n";
+        return implode("\n", $sql);
     }
 
     /**
