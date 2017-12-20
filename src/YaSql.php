@@ -155,7 +155,6 @@ class YaSql
         $definitions = $data['definitions'] ?? [];
         $auto_increment = [];
         $foreigns = [];
-        $flag = PREG_OFFSET_CAPTURE;
         foreach ($tables as $table => $columns) {
             $primary_key = [];
             foreach ($columns as $column => $query) {
@@ -193,10 +192,9 @@ class YaSql
                 /*
                  * Extract indexes
                  */
-                $p = '/ ?AUTO_INCREMENT ?/i';
-                if (preg_match($p, $query, $matches, $flag)) {
-                    $m = $matches[0];
-                    $query = substr_replace($query, ' ', $m[1], strlen($m[0]));
+                $result = self::extractKeyword($query, 'AUTO_INCREMENT');
+                if ($result !== false) {
+                    $query = $result;
                     if (isset($auto_increment[$table])) {
                         $message = 'Multiple AUTO_INCREMENT on table "'
                             . $table . '"';
@@ -205,16 +203,15 @@ class YaSql
                     $auto_increment[$table] = $column;
                 }
 
-                $p = '/ ?PRIMARY( KEY|) ?/i';
-                if (preg_match($p, $query, $matches, $flag)) {
-                    $m = $matches[0];
-                    $query = substr_replace($query, ' ', $m[1], strlen($m[0]));
+                $result = self::extractKeyword($query, 'PRIMARY( KEY|)');
+                if ($result !== false) {
+                    $query = $result;
                     $primary_key[] = $column;
                 }
 
-                if (preg_match('/ ?UNIQUE ?/i', $query, $matches, $flag)) {
-                    $m = $matches[0];
-                    $query = substr_replace($query, ' ', $m[1], strlen($m[0]));
+                $result = self::extractKeyword($query, 'UNIQUE');
+                if ($result !== false) {
+                    $query = $result;
                     $indexes[$table]['UNIQUE'][] = [$column];
                 }
 
@@ -465,5 +462,25 @@ class YaSql
             $array[$key] = $value . (--$count > 0 ? $others : $last);
         }
         return $array;
+    }
+
+    /**
+     * Extracts a keyword from a string
+     *
+     * @param string $haystack String to look for the keyword
+     * @param string $needle   PCRE subpattern with the keyword (insensitive)
+     *
+     * @return false  If the keyword was not found
+     * @return string The string without the keyword
+     */
+    protected static function extractKeyword(string $haystack, string $needle)
+    {
+        $pattern = '/ ?' . $needle . ' ?/i';
+        if (preg_match($pattern, $haystack, $matches, PREG_OFFSET_CAPTURE)) {
+            $m = $matches[0];
+            $haystack = substr_replace($haystack, ' ', $m[1], strlen($m[0]));
+            return $haystack;
+        }
+        return false;
     }
 }
