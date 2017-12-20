@@ -25,7 +25,6 @@ class YaSql
      * @var string
      */
     const INDEX_KEYWORDS = [
-        //'FOREIGN' => 'multiple',
         'PRIMARY' => 'single',
         'UNIQUE' => 'multiple',
     ];
@@ -76,7 +75,7 @@ class YaSql
      * @throws \RuntimeException         Syntax error in Foreign Key
      * @throws \LogicException           Multiple AUTO_INCREMENT indexes
      * @throws \LengthException          Column is empty
-     * @throws \LogicException           Multiple PRIMARY KEY index
+     * @throws \LogicException           Multiple PRIMARY KEY indexes
      */
     public function __construct($yaml)
     {
