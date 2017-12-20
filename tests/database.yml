@@ -1,5 +1,11 @@
 database:
   name: example
+  project: aryelgois/yasql
+  description: A YASQL database example
+  version: 1.0.0-alpha
+  license: MIT
+  authors:
+  - Aryel
 
 definitions:
   boolean: tinyint(1)

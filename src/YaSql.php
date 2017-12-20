@@ -297,12 +297,35 @@ class YaSql
 
         $db = $this->data['database'];
 
+        /*
+         * Generate Header
+         */
         $sql = [
-            '-- PHP YASQL output',
+            '-- Generated with yasql-php',
             '-- https://github.com/aryelgois/yasql-php',
             '--',
             '-- Timestamp: ' . date('c'),
             '-- PHP version: ' . phpversion(),
+        ];
+
+        $header = array_filter([
+            'Project'     => $db['project'] ?? '',
+            'Description' => $db['description'] ?? '',
+            'Version'     => $db['version'] ?? '',
+            'License'     => $db['license'] ?? '',
+            'Authors'     => implode(
+                "\n--          ",
+                (array) ($db['authors'] ?? '')
+            ),
+        ]);
+        if (!empty($header)) {
+            array_walk($header, function (&$v, $k) {
+                $v = '-- ' . $k . ': ' . $v;
+            });
+            array_unshift($header, '--');
+        }
+
+        $sql = array_merge($sql, array_values($header), [
             '',
             'CREATE DATABASE IF NOT EXISTS `' . $db['name'] . '`',
             $in . 'CHARACTER SET ' . ($db['charset'] ?? 'utf8'),
@@ -310,8 +333,11 @@ class YaSql
             '',
             'USE `' . $db['name'] . '`;',
             '',
-        ];
+        ]);
 
+        /*
+         * Generate SQL
+         */
         foreach ($this->data['tables'] as $table => $columns) {
             /*
              * Add Table
