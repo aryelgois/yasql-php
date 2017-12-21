@@ -26,6 +26,7 @@ class Builder
      * @throws \RuntimeException Missing keys in the config
      * @throws \RuntimeException Can not create output directory
      * @throws \RuntimeException Can not find YASQL database
+     * @throws \RuntimeException Can not find post file
      */
     public function __construct(string $config, string $root = null)
     {
@@ -45,13 +46,25 @@ class Builder
         }
 
         foreach ($config['databases'] as $database) {
-            $file = realpath($root . '/' . $database);
+            $path = $database['path'] ?? $database;
+            $post = $database['post'] ?? null;
+
+            $file = realpath($root . '/' . $path);
             if ($file === false) {
-                $message = 'Database "' . $database . '" not found';
+                $message = 'Database "' . $path . '" not found';
                 throw new \RuntimeException($message);
             }
 
-            $sql = Controller::generate(file_get_contents($database), $indent);
+            $sql = Controller::generate(file_get_contents($path), $indent);
+
+            if ($post) {
+                $file_post = realpath($root . '/' . $post);
+                if ($file_post === false) {
+                    $message = 'File "' . $post . '" not found';
+                    throw new \RuntimeException($message);
+                }
+                $sql .= "\n--\n-- Post\n--\n\n" . file_get_contents($file_post);
+            }
 
             $outfile = basename(substr($file, 0, strrpos($file, '.'))) . '.sql';
             file_put_contents($output . '/' . $outfile, $sql);
