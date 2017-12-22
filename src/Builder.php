@@ -18,6 +18,13 @@ use Symfony\Component\Yaml\Yaml;
 class Builder
 {
     /**
+     * Describes the build result
+     *
+     * @var string
+     */
+    protected $result;
+
+    /**
      * Creates a new Builder object
      *
      * @param string $config YAML with build configurations
@@ -45,6 +52,7 @@ class Builder
             throw new \RuntimeException('Can not create output directory');
         }
 
+        $list = [];
         foreach ($config['databases'] as $database) {
             $path = $database['path'] ?? $database;
             $post = $database['post'] ?? null;
@@ -68,6 +76,20 @@ class Builder
 
             $outfile = basename(substr($file, 0, strrpos($file, '.'))) . '.sql';
             file_put_contents($output . '/' . $outfile, $sql);
+            $list[] = $outfile;
         }
+
+        $this->result = "\nOutput at: " . $output
+            . "\nFiles generated:\n- " . implode("\n- ", $list) . "\n";
+    }
+
+    /**
+     * Returns the build result
+     *
+     * @return string
+     */
+    public function getResult()
+    {
+        return $this->result;
     }
 }

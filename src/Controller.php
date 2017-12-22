@@ -47,6 +47,7 @@ class Controller
         }
 
         $builder = new Builder(file_get_contents($path), $root);
+        echo $builder->getResult();
     }
 
     /**

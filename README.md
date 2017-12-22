@@ -104,6 +104,10 @@ This class wrapps the others, to make them easier to use.
   specific directory. The paths are relative to `$root`, which is the current
   working directory by default.
 
+- **getResult()**
+
+  Retrieves information about the build: output directory and generated files.
+
 
 #### config file
 
