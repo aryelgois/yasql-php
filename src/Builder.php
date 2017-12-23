@@ -126,11 +126,14 @@ class Builder
             );
 
             if (is_null($vendor_configs)) {
-                $vendor_configs = 'config/databases.yml';
+                $vendor_configs = [null];
             }
 
             foreach ((array) $vendor_configs as $vendor_config) {
-                $this->build($vendor_config, $this->vendors . '/' . $vendor);
+                $this->build(
+                    $vendor_config ?? 'config/databases.yml',
+                    $this->vendors . '/' . $vendor
+                );
             }
         }
     }
