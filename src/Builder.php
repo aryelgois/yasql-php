@@ -73,7 +73,7 @@ class Builder
         $root = $root ?? getcwd();
 
         $config = $root . '/' . $config;
-        $this->log[] = 'Load config file: ' . $config;
+        $this->log[] = 'Load config file ' . $config;
         $config = Yaml::parse(file_get_contents($config));
         $indent = $config['indentation'] ?? null;
 
@@ -120,7 +120,7 @@ class Builder
                 $this->log,
                 [
                     '',
-                    'Switch to vendor: ' . $vendor,
+                    'Switch to vendor ' . $vendor,
                     '',
                 ]
             );
