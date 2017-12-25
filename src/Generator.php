@@ -92,7 +92,7 @@ class Generator
                     '',
                 ],
                 ['CREATE TABLE `' . $table . '` ('],
-                array_values(self::arrayAppendLast($columns, '', ',')),
+                array_values(Utils::arrayAppendLast($columns, '', ',')),
                 [
                     ') CHARACTER SET ' . ($db['charset'] ?? 'utf8') . ';',
                     ''
@@ -128,7 +128,7 @@ class Generator
                         '',
                     ],
                     ['ALTER TABLE `' . $table . '`'],
-                    self::arrayAppendLast($id, ';', ','),
+                    Utils::arrayAppendLast($id, ';', ','),
                     ['']
                 );
             }
@@ -152,7 +152,7 @@ class Generator
                         '',
                     ],
                     ['ALTER TABLE `' . $table . '`'],
-                    self::arrayAppendLast($f, ';', ','),
+                    Utils::arrayAppendLast($f, ';', ','),
                     ['']
                 );
             }
@@ -187,24 +187,6 @@ class Generator
         );
 
         $this->sql = implode("\n", $sql);
-    }
-
-    /**
-     * Appends a string to the last item in an array
-     *
-     * Optionally, appends a string to the other items
-     *
-     * @param string[] $array  Array to receive data
-     * @param string   $last   Appended to the last item
-     * @param string   $others Appended to the other items
-     */
-    protected static function arrayAppendLast($array, $last, $others = '')
-    {
-        $count = count($array);
-        foreach ($array as $key => $value) {
-            $array[$key] = $value . (--$count > 0 ? $others : $last);
-        }
-        return $array;
     }
 
     /**
