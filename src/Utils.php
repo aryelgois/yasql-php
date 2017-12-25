@@ -24,8 +24,11 @@ class Utils
      * @param string   $last   Appended to the last item
      * @param string   $others Appended to the other items
      */
-    public static function arrayAppendLast($array, $last, $others = '')
-    {
+    public static function arrayAppendLast(
+        array $array,
+        string $last,
+        string $others = ''
+    ) {
         $count = count($array);
         foreach ($array as $key => $value) {
             $array[$key] = $value . (--$count > 0 ? $others : $last);

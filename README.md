@@ -151,8 +151,21 @@ The post file is useful for pre populated rows or to apply sql commands not
 covered by YASQL specification. Its content is appended to the generated sql.
 
 
+## Utils
+
+There is also a class with utility methods. They are used internally and can be
+used by whoever require this package.
+
+- **arrayAppendLast(** [array] $array , [string] $last \[, [string] $others \] **)**
+
+  Appends a string to the last item. Optionally, appends a string to the others.
+  It is useful to generate sql statements with a list of comma separated items,
+  and a semicolon at the last item.
+
+
 [aryelgois/yasql]: https://github.com/aryelgois/yasql
 [Event]: https://getcomposer.org/apidoc/master/Composer/Script/Event.html
+[array]: https://secure.php.net/manual/en/language.types.array.php
 [int]: https://secure.php.net/manual/en/language.types.integer.php
 [string]: https://secure.php.net/manual/en/language.types.string.php
 [Parser]: src/Parser.php
