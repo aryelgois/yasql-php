@@ -190,7 +190,7 @@ class Generator
     }
 
     /**
-     * Returns teh generated SQL
+     * Returns the generated SQL
      *
      * @return string
      */
