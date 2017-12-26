@@ -127,7 +127,8 @@ This class wrapps the others, to make them easier to use.
 A YAML with a mapping of the following keys: (all are optional)
 
 - `databases`: sequence of files with YASQL database schemas. It can be a
-  string or a mapping of the YASQL path and a post sql
+  string or a mapping of the YASQL path and a post sql (or a sequence of post
+  files)
 - `indentation`: used during the sql generation
 - `vendors`: a map of vendors installed by Composer to config files inside them.
   It can be a string (for a single config) or a sequence of paths. They are

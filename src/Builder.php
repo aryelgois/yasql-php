@@ -89,14 +89,15 @@ class Builder
                 }
                 $sql = Controller::generate(file_get_contents($file), $indent);
 
-                $post = $database['post'] ?? null;
-                if ($post) {
+                $post_list = (array) ($database['post'] ?? []);
+                foreach ($post_list as $post) {
                     $post = $root . '/' . $post;
                     $post_file = realpath($post);
                     if ($post_file === false) {
                         $this->log[] = 'W: Post file "' . $post . '" not found';
                     } else {
-                        $sql .= "\n--\n-- Post\n--\n\n"
+                        $sql .= "\n--\n-- Post '" . basename($post) . "'"
+                              . "\n--\n\n"
                               . file_get_contents($post_file);
                     }
                 }
