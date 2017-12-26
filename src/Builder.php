@@ -77,43 +77,42 @@ class Builder
         $config = Yaml::parse(file_get_contents($config));
         $indent = $config['indentation'] ?? null;
 
-        if (!array_key_exists('databases', $config)) {
-            $this->log[] = 'E: Missing key "databases"';
-            return;
-        }
-
-        $generated = [];
-        foreach ($config['databases'] as $database) {
-            $path = $root . '/' . ($database['path'] ?? $database);
-            $file = realpath($path);
-            if ($file === false) {
-                $this->log[] = 'E: Database "' . $path . '" not found';
-                continue;
-            }
-            $sql = Controller::generate(file_get_contents($file), $indent);
-
-            $post = $database['post'] ?? null;
-            if ($post) {
-                $post = $root . '/' . $post;
-                $post_file = realpath($post);
-                if ($post_file === false) {
-                    $this->log[] = 'W: Post file "' . $post . '" not found';
-                } else {
-                    $sql .= "\n--\n-- Post\n--\n\n"
-                          . file_get_contents($post_file);
+        $databases = $config['databases'] ?? [];
+        if (!empty($databases)) {
+            $generated = [];
+            foreach ($config['databases'] as $database) {
+                $path = $root . '/' . ($database['path'] ?? $database);
+                $file = realpath($path);
+                if ($file === false) {
+                    $this->log[] = 'E: Database "' . $path . '" not found';
+                    continue;
                 }
+                $sql = Controller::generate(file_get_contents($file), $indent);
+
+                $post = $database['post'] ?? null;
+                if ($post) {
+                    $post = $root . '/' . $post;
+                    $post_file = realpath($post);
+                    if ($post_file === false) {
+                        $this->log[] = 'W: Post file "' . $post . '" not found';
+                    } else {
+                        $sql .= "\n--\n-- Post\n--\n\n"
+                              . file_get_contents($post_file);
+                    }
+                }
+
+                $outfile = basename(substr($file, 0, strrpos($file, '.')))
+                         . '.sql';
+                file_put_contents($this->output . '/' . $outfile, $sql);
+                $generated[] = '- ' . $outfile;
             }
 
-            $outfile = basename(substr($file, 0, strrpos($file, '.'))) . '.sql';
-            file_put_contents($this->output . '/' . $outfile, $sql);
-            $generated[] = '- ' . $outfile;
+            $this->log = array_merge(
+                $this->log,
+                ['Files generated:'],
+                $generated
+            );
         }
-
-        $this->log = array_merge(
-            $this->log,
-            ['Files generated:'],
-            $generated
-        );
 
         foreach ($config['vendors'] ?? [] as $vendor => $vendor_configs) {
             $this->log = array_merge(

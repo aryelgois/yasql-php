@@ -124,7 +124,7 @@ This class wrapps the others, to make them easier to use.
 
 #### config file
 
-A YAML with a mapping of the following keys: (only `databases` is required)
+A YAML with a mapping of the following keys: (all are optional)
 
 - `databases`: sequence of files with YASQL database schemas. It can be a
   string or a mapping of the YASQL path and a post sql
