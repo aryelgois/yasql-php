@@ -57,7 +57,7 @@ under the namespace `aryelgois\YaSql`.
 
 ## Controller
 
-This class wrapps the others, to make them easier to use.
+This class wrapps others, to make them easier to use.
 
 - _static_ **build(** [Event] $event **)**
 
@@ -152,6 +152,36 @@ The post file is useful for pre populated rows or to apply sql commands not
 covered by YASQL specification. Its content is appended to the generated sql.
 
 
+## Populator
+
+A helper class for **Builder**. Use it to generate `INSERT INTO` statements to
+populate your databases.
+
+This class is _abstract_, so you have to write a class that extends it. The
+reason is that the YAML with the data might be in a arbitrary layout, depending
+on your database schema.
+
+To use it, you need a special post in the builder config:
+
+Example from [aryelgois/databases]:
+
+```yml
+databases:
+- path: data/address.yml
+  post:
+  - data/address/populate_countries.sql
+  - call: aryelgois\Databases\AddressPopulator
+    with:
+    - data/address/source/Brazil.yml
+```
+
+The post must map to a sequence, and one of it items is a map of:
+
+- `call`: a fully qualified class that extends **Populator**, autoloaded by
+  Composer
+- `with`: path to a YAML with the data to be processed. It can be a sequence
+
+
 ## Utils
 
 There is also a class with utility methods. They are used internally and can be
@@ -165,6 +195,7 @@ used by whoever require this package.
 
 
 [aryelgois/yasql]: https://github.com/aryelgois/yasql
+[aryelgois/databases]: https://github.com/aryelgois/databases
 [Event]: https://getcomposer.org/apidoc/master/Composer/Script/Event.html
 [array]: https://secure.php.net/manual/en/language.types.array.php
 [int]: https://secure.php.net/manual/en/language.types.integer.php
