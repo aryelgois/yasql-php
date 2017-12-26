@@ -7,6 +7,7 @@
 
 namespace aryelgois\YaSql;
 
+use aryelgois\YaSql\Populator;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -91,14 +92,46 @@ class Builder
 
                 $post_list = (array) ($database['post'] ?? []);
                 foreach ($post_list as $post) {
-                    $post = $root . '/' . $post;
-                    $post_file = realpath($post);
-                    if ($post_file === false) {
-                        $this->log[] = 'W: Post file "' . $post . '" not found';
+                    if (is_array($post)) {
+                        $post_name = $class = $post['call'];
+                        if (is_subclass_of($class, Populator::class)) {
+                            $obj = new $class($root);
+                            $result = [];
+                            foreach ((array) $post['with'] as $with) {
+                                $obj->load($with);
+                                $result = array_merge(
+                                    $result,
+                                    [
+                                        '--',
+                                        "-- With '" . basename($with) . "'",
+                                        '--',
+                                        '',
+                                        $obj->run(),
+                                    ]
+                                );
+                            }
+                            $post = implode("\n", $result);
+                        } else {
+                            $this->log[] = 'E: Class "' . $class
+                                . '" does not extend ' . Populator::class;
+                            $post = null;
+                        }
                     } else {
-                        $sql .= "\n--\n-- Post '" . basename($post) . "'"
+                        $post = $root . '/' . $post;
+                        $post_file = realpath($post);
+                        if ($post_file !== false) {
+                            $post_name = basename($post);
+                            $post = file_get_contents($post_file);
+                        } else {
+                            $this->log[] = 'W: Post file "' . $post
+                                . '" not found';
+                            $post = null;
+                        }
+                    }
+                    if (!is_null($post)) {
+                        $sql .= "\n--\n-- Post '" . $post_name . "'"
                               . "\n--\n\n"
-                              . file_get_contents($post_file);
+                              . $post;
                     }
                 }
 
