@@ -42,6 +42,13 @@ abstract class Populator
     protected $data;
 
     /**
+     * File loaded
+     *
+     * @var string
+     */
+    protected $filename;
+
+    /**
      * Root directory to load files
      *
      * @var string
@@ -66,6 +73,7 @@ abstract class Populator
     public function load(string $file)
     {
         $this->data = Yaml::parse(file_get_contents($this->root . '/' . $file));
+        $this->filename = basename($file);
     }
 
     /**
