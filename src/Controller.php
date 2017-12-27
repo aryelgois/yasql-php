@@ -33,7 +33,8 @@ class Controller
 
         if (empty($args)) {
             echo "Usage:\n\n"
-               . "composer yasql-builder -- OUTPUT_DIR [CONFIG_FILE]\n";
+               . "composer yasql-builder -- OUTPUT_DIR [CONFIG_FILE]\n\n"
+               . "By default, CONFIG_FILE is in `config/databases.yml`\n";
             die(1);
         }
 
