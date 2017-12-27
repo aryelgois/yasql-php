@@ -27,7 +27,7 @@ class Utils
     public static function arrayAppendLast(
         array $array,
         string $last,
-        string $others = ''
+        string $others = null
     ) {
         $count = count($array);
         foreach ($array as $key => $value) {
