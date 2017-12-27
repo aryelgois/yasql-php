@@ -1,7 +1,7 @@
 {
     "name": "aryelgois/yasql-php",
     "description": "A PHP implementation for YAML Ain't SQL",
-    "keywords": ["PHP", "YAML", "SQL", "database", "schema"],
+    "keywords": ["PHP", "YAML", "SQL", "database", "schema", "yasql"],
     "license": "MIT",
     "authors": [
         {

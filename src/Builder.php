@@ -7,6 +7,7 @@
 
 namespace aryelgois\YaSql;
 
+use aryelgois\YaSql\Populator;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -18,78 +19,165 @@ use Symfony\Component\Yaml\Yaml;
 class Builder
 {
     /**
-     * Describes the build result
+     * Build log
+     *
+     * @var string[]
+     */
+    protected $log;
+
+    /**
+     * Path to build output
      *
      * @var string
      */
-    protected $result;
+    protected $output;
+
+    /**
+     * Path to vendors directory
+     *
+     * @var string|false
+     */
+    protected $vendors;
 
     /**
      * Creates a new Builder object
      *
-     * @param string $config YAML with build configurations
-     * @param string $root   From where to solve the paths
+     * @param string $output  Where files will be stored
+     * @param string $vendors Path to vendors directory
      *
-     * @throws \RuntimeException Missing keys in the config
      * @throws \RuntimeException Can not create output directory
-     * @throws \RuntimeException Can not find YASQL database
-     * @throws \RuntimeException Can not find post file
      */
-    public function __construct(string $config, string $root = null)
+    public function __construct(string $output, string $vendors = null)
     {
-        $config = Yaml::parse($config);
-        $root = $root ?? getcwd();
-        $indent = $config['indentation'] ?? null;
-
-        foreach (['databases', 'output'] as $key) {
-            if (!array_key_exists($key, $config)) {
-                throw new \RuntimeException('Missing key "' . $key . '"');
-            }
-        }
-
-        $output = $root . '/' . trim($config['output'], '/');
         if (!is_dir($output) && !mkdir($output, 0775, true)) {
             throw new \RuntimeException('Can not create output directory');
         }
 
-        $list = [];
-        foreach ($config['databases'] as $database) {
-            $path = $database['path'] ?? $database;
-            $post = $database['post'] ?? null;
+        $this->output = realpath($output);
+        $this->vendors = realpath($vendors ?? 'vendor');
 
-            $file = realpath($root . '/' . $path);
-            if ($file === false) {
-                $message = 'Database "' . $path . '" not found';
-                throw new \RuntimeException($message);
-            }
-
-            $sql = Controller::generate(file_get_contents($path), $indent);
-
-            if ($post) {
-                $file_post = realpath($root . '/' . $post);
-                if ($file_post === false) {
-                    $message = 'File "' . $post . '" not found';
-                    throw new \RuntimeException($message);
-                }
-                $sql .= "\n--\n-- Post\n--\n\n" . file_get_contents($file_post);
-            }
-
-            $outfile = basename(substr($file, 0, strrpos($file, '.'))) . '.sql';
-            file_put_contents($output . '/' . $outfile, $sql);
-            $list[] = $outfile;
-        }
-
-        $this->result = "\nOutput at: " . $output
-            . "\nFiles generated:\n- " . implode("\n- ", $list) . "\n";
+        $this->log = [
+            'Build start: ' . date('c'),
+            'Output: ' . $this->output,
+            '',
+        ];
     }
 
     /**
-     * Returns the build result
+     * Builds databases in a config file
+     *
+     * @param string $config Path to YAML with build configurations
+     * @param string $root   From where to solve the paths
+     */
+    public function build(string $config, string $root = null)
+    {
+        $root = $root ?? getcwd();
+
+        $config = $root . '/' . $config;
+        $this->log[] = 'Load config file ' . $config;
+        $config = Yaml::parse(file_get_contents($config));
+        $indent = $config['indentation'] ?? null;
+
+        $databases = $config['databases'] ?? [];
+        if (!empty($databases)) {
+            $generated = [];
+            foreach ($config['databases'] as $database) {
+                $path = $root . '/' . ($database['path'] ?? $database);
+                $file = realpath($path);
+                if ($file === false) {
+                    $this->log[] = 'E: Database "' . $path . '" not found';
+                    continue;
+                }
+                $sql = Controller::generate(file_get_contents($file), $indent);
+
+                $post_list = (array) ($database['post'] ?? []);
+                foreach ($post_list as $post) {
+                    if (is_array($post)) {
+                        $post_name = $class = $post['call'];
+                        if (is_subclass_of($class, Populator::class)) {
+                            $obj = new $class($root);
+                            $result = [];
+                            foreach ((array) $post['with'] as $with) {
+                                $obj->load($with);
+                                $result = array_merge(
+                                    $result,
+                                    [
+                                        '--',
+                                        "-- With '" . basename($with) . "'",
+                                        '--',
+                                        '',
+                                        $obj->run(),
+                                    ]
+                                );
+                            }
+                            $post = implode("\n", $result);
+                        } else {
+                            $this->log[] = 'E: Class "' . $class
+                                . '" does not extend ' . Populator::class;
+                            $post = null;
+                        }
+                    } else {
+                        $post = $root . '/' . $post;
+                        $post_file = realpath($post);
+                        if ($post_file !== false) {
+                            $post_name = basename($post);
+                            $post = file_get_contents($post_file);
+                        } else {
+                            $this->log[] = 'W: Post file "' . $post
+                                . '" not found';
+                            $post = null;
+                        }
+                    }
+                    if (!is_null($post)) {
+                        $sql .= "\n--\n-- Post '" . $post_name . "'"
+                              . "\n--\n\n"
+                              . $post;
+                    }
+                }
+
+                $outfile = basename(substr($file, 0, strrpos($file, '.')))
+                         . '.sql';
+                file_put_contents($this->output . '/' . $outfile, $sql);
+                $generated[] = '- ' . $outfile;
+            }
+
+            $this->log = array_merge(
+                $this->log,
+                ['Files generated:'],
+                $generated
+            );
+        }
+
+        foreach ($config['vendors'] ?? [] as $vendor => $vendor_configs) {
+            $this->log = array_merge(
+                $this->log,
+                [
+                    '',
+                    'Switch to vendor ' . $vendor,
+                    '',
+                ]
+            );
+
+            if (is_null($vendor_configs)) {
+                $vendor_configs = [null];
+            }
+
+            foreach ((array) $vendor_configs as $vendor_config) {
+                $this->build(
+                    $vendor_config ?? 'config/databases.yml',
+                    $this->vendors . '/' . $vendor
+                );
+            }
+        }
+    }
+
+    /**
+     * Returns the build log
      *
      * @return string
      */
-    public function getResult()
+    public function getLog()
     {
-        return $this->result;
+        return implode("\n", $this->log);
     }
 }

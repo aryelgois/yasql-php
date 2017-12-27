@@ -26,28 +26,34 @@ class Controller
      * file (relative to the package root) is required.
      *
      * @param Event $event Composer run-script event
-     *
-     * @throws \BadMethodCallException Missing config file argument
-     * @throws \RuntimeException       Can not read config file
      */
     public static function build(Event $event)
     {
         $args = $event->getArguments();
 
         if (empty($args)) {
-            throw new \BadMethodCallException('The config file argument is missing');
+            echo "Usage:\n\n"
+               . "composer yasql-builder -- OUTPUT_DIR [CONFIG_FILE]\n\n"
+               . "By default, CONFIG_FILE is in `config/databases.yml`\n";
+            die(1);
         }
+
+        $output = $args[0];
+        $vendors = $event->getComposer()->getConfig()->get('vendor-dir');
+
+        $builder = new Builder($output);
 
         $root = getcwd();
-        $path = realpath($root . '/' . $args[0]);
+        $config = $args[1] ?? 'config/databases.yml';
 
-        if (!$path || !is_readable($path)) {
-            $message = 'File "' . $path . '" does not exist or cannot be read.';
-            throw new \RuntimeException($message);
+        try {
+            $builder->build($config, $root);
         }
-
-        $builder = new Builder(file_get_contents($path), $root);
-        echo $builder->getResult();
+        catch (Exception $e) {
+            throw $e;
+        } finally {
+            echo $builder->getLog() . "\n";
+        }
     }
 
     /**

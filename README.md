@@ -23,7 +23,8 @@ For easier access to the builder, add the following to your `composer.json`:
 }
 ```
 
-And create a config file `databases.yml` somewhere.  
+And create a config file somewhere. The default is `config/databases.yml`, but
+you can have more than one configuration.  
 _(see specifications in **Builder**)_
 
 
@@ -32,12 +33,17 @@ _(see specifications in **Builder**)_
 Create databases following the [YASQL][aryelgois/yasql] schema and add them in
 your `databases.yml`. Then run the following command inside your project root:
 
-`composer run-script yasql-builder -- path/to/databases.yml`
+`composer run-script yasql-builder -- path/to/build [path/to/config_file.yml]`
 
 > **NOTE**
 >
-> All paths (inside `databases.yml` and in the previous command) are relative to
-> your project root.
+> - All paths (inside the config file and in the previous command) are relative
+>   to your project root
+>
+> - If you use the default config file location `config/databases.yml`, it is
+>   optional
+>
+> - It might be a good idea to add the build directory to your .gitignore
 
 It will create `.sql` files in the output directory, so you can import them into
 your sql server.
@@ -51,12 +57,13 @@ under the namespace `aryelgois\YaSql`.
 
 ## Controller
 
-This class wrapps the others, to make them easier to use.
+This class wrapps others, to make them easier to use.
 
 - _static_ **build(** [Event] $event **)**
 
   Use this method with `composer run-script` to build your databases into a
-  specific directory. It receives an argument with the path to a config file.  
+  specific directory. It receives an argument with the path to output directory
+  and a optional config file (defaults to `config/databases.yml`).  
   (see **Builder**)
 
 - _static_ **generate(** [string] $yasql \[, [int] $indent \] **)**
@@ -98,25 +105,34 @@ This class wrapps the others, to make them easier to use.
 
 ## Builder
 
-- **__construct(** [string] $config \[, [string] $root \] **)**
+- **__construct(** [string] $output \[, [string] $vendors \] **)**
 
-  Generates a list of databases stored in the filesystem and outputs in a
-  specific directory. The paths are relative to `$root`, which is the current
-  working directory by default.
+  Creates a new Builder object. Databases will go into `$output`, and vendors
+  are searched in `$vendors`. Both paths can be absolut or relative, and the
+  latter is by default `vendor` in the current working directory.
 
-- **getResult()**
+- **build(** [string] $config \[, [string] $root \] **)**
 
-  Retrieves information about the build: output directory and generated files.
+  Generates a list of databases from the filesystem into the object's output
+  directory. The paths are relative to `$root`, which is the current working
+  directory by default.
+
+- **getLog()**
+
+  Retrieves log information from the build process.
 
 
 #### config file
 
-A YAML with a mapping of the following keys:
+A YAML with a mapping of the following keys: (all are optional)
 
 - `databases`: sequence of files with YASQL database schemas. It can be a
-  string or a mapping of the YASQL path and a post sql
-- `output`: path to a directory were the generated files will be stored
-- `indentation`: _(optional)_ used during the sql generation
+  string or a mapping of the YASQL path and a post sql (or a sequence of post
+  files)
+- `indentation`: used during the sql generation
+- `vendors`: a map of vendors installed by Composer to config files inside them.
+  It can be a string (for a single config) or a sequence of paths. They are
+  relative to the vendor package root
 
 Example:
 
@@ -128,15 +144,60 @@ databases:
 
 indentation: 4
 
-output: build/databases
+vendors:
+  someone/package: config/databases.yml # could be ~ (yaml null) for the default
 ```
 
 The post file is useful for pre populated rows or to apply sql commands not
 covered by YASQL specification. Its content is appended to the generated sql.
 
 
+## Populator
+
+A helper class for **Builder**. Use it to generate `INSERT INTO` statements to
+populate your databases.
+
+This class is _abstract_, so you have to write a class that extends it. The
+reason is that the YAML with the data might be in a arbitrary layout, depending
+on your database schema.
+
+To use it, you need a special post in the builder config:
+
+Example from [aryelgois/databases]:
+
+```yml
+databases:
+- path: data/address.yml
+  post:
+  - data/address/populate_countries.sql
+  - call: aryelgois\Databases\AddressPopulator
+    with:
+    - data/address/source/Brazil.yml
+```
+
+The post must map to a sequence, and one of it items is a map of:
+
+- `call`: a fully qualified class that extends **Populator**, autoloaded by
+  Composer
+- `with`: path to a YAML with the data to be processed. It can be a sequence
+
+
+## Utils
+
+There is also a class with utility methods. They are used internally and can be
+used by whoever require this package.
+
+- **arrayAppendLast(** [array] $array , [string] $last \[, [string] $others \] **)**
+
+  Appends a string to the last item. Optionally, appends a string to the others.
+  It is useful to generate sql statements with a list of comma separated items,
+  and a semicolon at the last item.
+
+
 [aryelgois/yasql]: https://github.com/aryelgois/yasql
+[aryelgois/databases]: https://github.com/aryelgois/databases
 [Event]: https://getcomposer.org/apidoc/master/Composer/Script/Event.html
+[array]: https://secure.php.net/manual/en/language.types.array.php
 [int]: https://secure.php.net/manual/en/language.types.integer.php
 [string]: https://secure.php.net/manual/en/language.types.string.php
 [Parser]: src/Parser.php
