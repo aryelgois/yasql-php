@@ -34,8 +34,8 @@ class Composer
         $args = $event->getArguments();
         if (empty($args)) {
             echo "Usage:\n\n"
-               . "composer yasql-builder -- OUTPUT_DIR [CONFIG_FILE]\n\n"
-               . "By default, CONFIG_FILE is in `config/databases.yml`\n";
+               . "composer yasql-build -- OUTPUT_DIR [CONFIG_FILE]\n\n"
+               . "By default, CONFIG_FILE is 'config/databases.yml'\n";
             die(1);
         }
 
