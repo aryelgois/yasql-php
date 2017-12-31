@@ -45,4 +45,25 @@ class Composer
             $args[1] ?? 'config/databases.yml'
         );
     }
+
+    /**
+     * Generates the SQL from a YASQL file
+     *
+     * @argument string $1 Path to YASQL file
+     * @argument int    $2 How many spaces per indentation level
+     *
+     * @param Event $event Composer run-script event
+     */
+    public static function generate(Event $event)
+    {
+        $args = $event->getArguments();
+        if (empty($args)) {
+            echo "Usage:\n\n"
+               . "composer yasql-generate -- YASQL_FILE [INDENTATION]\n\n"
+               . "By default, INDENTATION is 2\n";
+            die(1);
+        }
+
+        echo Controller::generate(file_get_contents($args[0]), $args[1] ?? 2);
+    }
 }
