@@ -13,27 +13,32 @@ Enter the terminal, navigate to your project root and run:
 
 # Setup
 
-For easier access to the builder, add the following to your `composer.json`:
+This package provides CLI tools to work with YASQL files. To use them, add the
+following in your `composer.json`:
 
 ```json
 {
     "scripts": {
-        "yasql-builder" : "aryelgois\\YaSql\\Controller::build"
+        "yasql-build": "aryelgois\\YaSql\\Composer::build",
+        "yasql-generate": "aryelgois\\YaSql\\Composer::generate"
     }
 }
 ```
 
-And create a config file somewhere. The default is `config/databases.yml`, but
-you can have more than one configuration.  
+You also need a config file for the builder command. The default is to place it
+in `config/databases.yml`, but you can choose another place or have more than
+one configuration.  
 _(see specifications in **Builder**)_
 
 
 # Usage
 
+## Builder
+
 Create databases following the [YASQL][aryelgois/yasql] schema and add them in
 your `databases.yml`. Then run the following command inside your project root:
 
-`composer run-script yasql-builder -- path/to/build [path/to/config_file.yml]`
+`composer run-script yasql-build -- path/to/output [path/to/config_file.yml]`
 
 > **NOTE**
 >
@@ -43,10 +48,21 @@ your `databases.yml`. Then run the following command inside your project root:
 > - If you use the default config file location `config/databases.yml`, it is
 >   optional
 >
-> - It might be a good idea to add the build directory to your .gitignore
+> - It might be a good idea to add the output directory to your .gitignore
 
 It will create `.sql` files in the output directory, so you can import them into
 your sql server.
+
+
+## Generator
+
+If you only want to generate the SQL from one YASQL schema, run the following
+command:
+
+`composer run-script yasql-generate -- path/to/yasql.yml [indentation]`
+
+It will output to stdout, so you can add something like ` > output_database.sql`
+to write the result in a file. The indentation defaults to 2 spaces.
 
 
 # API
@@ -55,15 +71,29 @@ This package provides some classes to parse YASQL and generate SQL. They are
 under the namespace `aryelgois\YaSql`.
 
 
+## Composer
+
+Provides Composer scripts to use this package from the command line.  
+_(see how to configure the commands in **Setup**)_
+
+- _static_ **build(** [Event] $event **)**
+
+  It receives an argument with the path to output directory and a optional
+  config file (defaults to `config/databases.yml`).
+
+- _static_ **generate(** [Event] $event **)**
+
+  The first argument is the path to a YASQL file, the second is a optional
+  indentation to be used (default is 2 spaces).
+
+
 ## Controller
 
 This class wrapps others, to make them easier to use.
 
-- _static_ **build(** [Event] $event **)**
+- _static_ **build(** [string] $root , [string] $output , [string] $config **)**
 
-  Use this method with `composer run-script` to build your databases into a
-  specific directory. It receives an argument with the path to output directory
-  and a optional config file (defaults to `config/databases.yml`).  
+  Use this method to build your databases into a specific directory.  
   (see **Builder**)
 
 - _static_ **generate(** [string] $yasql \[, [int] $indent \] **)**
