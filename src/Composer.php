@@ -10,7 +10,7 @@ namespace aryelgois\YaSql;
 use Composer\Script\Event;
 
 /**
- * Composer events for command line use
+ * Composer scripts for command line use
  *
  * Use it with Composer's run-script
  *
