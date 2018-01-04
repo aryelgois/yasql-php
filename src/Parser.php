@@ -67,6 +67,7 @@ class Parser
      * @throws \DomainException          Unsupported source
      * @throws \DomainException          Unknown index
      * @throws \LogicException           Duplicated composite for single column key
+     * @throws \LengthException          Missing column definition
      * @throws \RuntimeException         Syntax error in Foreign Key
      * @throws \LogicException           Multiple AUTO_INCREMENT indexes
      * @throws \LengthException          Column is empty
@@ -152,6 +153,15 @@ class Parser
         foreach ($tables as $table => $columns) {
             $primary_key = [];
             foreach ($columns as $column => $query) {
+                /*
+                 * Pre validation
+                 */
+                $query = trim($query);
+                if (strlen($query) == 0) {
+                    $message = "Missing column definition in `$table`.`$column`";
+                    throw new \LengthException($message);
+                }
+
                 /*
                  * Expand definitions
                  */
