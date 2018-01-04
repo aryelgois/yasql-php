@@ -20,6 +20,18 @@ use Symfony\Component\Yaml\Yaml;
 class Parser
 {
     /**
+     * Identifier patterns accepted in a SQL
+     *
+     * @see https://dev.mysql.com/doc/refman/5.7/en/identifiers.html
+     *
+     * @var string[]
+     */
+    const IDENTIFIER_PATTERNS = [
+        'unquoted' => '[0-9a-zA-Z$_\x{0080}-\x{FFFF}]',
+        'quoted' => '[\x{0001}-\x{007F}\x{0080}-\x{FFFF}]'
+    ];
+
+    /**
      * Set of Index keywords
      *
      * The value determines if a table can have one or more indexes
@@ -48,18 +60,6 @@ class Parser
         'float',
         'decimal',
         'numeric',
-    ];
-
-    /**
-     * Identifier patterns accepted in a SQL
-     *
-     * @see https://dev.mysql.com/doc/refman/5.7/en/identifiers.html
-     *
-     * @var string[]
-     */
-    const IDENTIFIER_PATTERNS = [
-        'unquoted' => '[0-9a-zA-Z$_\x{0080}-\x{FFFF}]',
-        'quoted' => '[\x{0001}-\x{007F}\x{0080}-\x{FFFF}]'
     ];
 
     /**
