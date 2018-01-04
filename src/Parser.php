@@ -208,7 +208,7 @@ class Parser
                 }
 
                 /*
-                 * Extract indexes
+                 * Extract keywords
                  */
                 $result = self::extractKeyword($query, 'AUTO_INCREMENT');
                 if ($result !== false) {
@@ -226,23 +226,26 @@ class Parser
                     $primary_key[] = $column;
                 }
 
-                $result = self::extractKeyword($query, 'UNIQUE');
+                $result = self::extractKeyword($query, 'UNIQUE( KEY|)');
                 if ($result !== false) {
                     $query = $result;
                     $indexes[$table]['UNIQUE'][] = [$column];
                 }
 
-                /*
-                 * Validation
-                 */
-                $query = trim($query);
-                if (strlen($query) == 0) {
-                    $message = "Column `$table`.`$column` is empty";
-                    throw new \LengthException($message);
+                $result = self::extractKeyword(
+                    $query,
+                    '((DEFAULT|COMMENT|COLUMN_FORMAT|STORAGE|REFERENCES).*)$',
+                    $keywords
+                );
+                if ($result !== false) {
+                    $query = $result;
+                    $keywords = $keywords[0][0];
+                } else {
+                    $keywords = '';
                 }
 
                 /*
-                 * Defaults
+                 * YASQL keywords
                  */
                 $sign = strpos($query, '+');
                 if ($sign === false) {
@@ -261,6 +264,20 @@ class Parser
                     } else {
                         $query = str_replace('NULLABLE', 'NULL', $query);
                     }
+                }
+
+                /*
+                 * Restore keywords
+                 */
+                $query .= $keywords;
+
+                /*
+                 * Validation
+                 */
+                $query = trim($query);
+                if (strlen($query) == 0) {
+                    $message = "Column `$table`.`$column` is empty";
+                    throw new \LengthException($message);
                 }
 
                 /*
@@ -304,17 +321,23 @@ class Parser
      *
      * @param string $haystack String to look for the keyword
      * @param string $needle   PCRE subpattern with the keyword (insensitive)
+     * @param string $matches  @see \preg_match() $matches (PREG_OFFSET_CAPTURE)
      *
      * @return false  If the keyword was not found
      * @return string The string without the keyword
      */
-    protected static function extractKeyword(string $haystack, string $needle)
-    {
-        $pattern = '/ ?' . $needle . ' ?/i';
+    protected static function extractKeyword(
+        string $haystack,
+        string $needle,
+        &$matches = null
+    ) {
+        $pattern = '/' . (strpos($needle, '^') === 0 ? '' : ' ?') . $needle
+            . (strrpos($needle, '$') === strlen($needle)-1 ? '' : ' ?') . '/i';
+
         if (preg_match($pattern, $haystack, $matches, PREG_OFFSET_CAPTURE)) {
             $m = $matches[0];
             $haystack = substr_replace($haystack, ' ', $m[1], strlen($m[0]));
-            return $haystack;
+            return trim($haystack);
         }
         return false;
     }
