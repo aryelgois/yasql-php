@@ -197,12 +197,12 @@ Example from [aryelgois/databases]:
 
 ```yml
 databases:
-- path: data/address.yml
-  post:
-  - data/address/populate_countries.sql
-  - call: aryelgois\Databases\AddressPopulator
-    with:
-    - data/address/source/Brazil.yml
+  - path: data/address.yml
+    post:
+      - data/address/populate_countries.sql
+      - call: aryelgois\Databases\AddressPopulator
+        with:
+          - data/address/source/Brazil.yml
 ```
 
 The post must map to a sequence, and one of it items is a map of:
