@@ -258,12 +258,18 @@ class Parser
                     $query = substr_replace($query, '', $sign, 1);
                 }
 
-                if (stripos($query, 'NOT NULL') === false) {
-                    if (stripos($query, 'NULL') === false) {
-                        $query .= ' NOT NULL';
-                    } else {
-                        $query = str_replace('NULLABLE', 'NULL', $query);
-                    }
+                $result = self::extractKeyword(
+                    $query,
+                    '(NOT NULL|NULLABLE|NULL)',
+                    $key
+                );
+                if ($result !== false) {
+                    $key = ($key[1][0] == 'NULLABLE')
+                        ? 'NULL'
+                        : $key[1][0];
+                    $query = $result . ' ' . $key;
+                } else {
+                    $query .= ' NOT NULL';
                 }
 
                 /*
