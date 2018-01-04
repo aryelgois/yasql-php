@@ -138,7 +138,7 @@ class Parser
 
             $key = strtoupper($tokens[0]);
             if (!array_key_exists($key, $keywords)) {
-                throw new \DomainException('Unknown index "' . $key . '"');
+                throw new \DomainException("Unknown index '$key'");
             }
 
             $table = $tokens[1];
