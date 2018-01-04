@@ -66,7 +66,7 @@ class Parser
      * @throws \RuntimeException         Missing Database name
      * @throws \DomainException          Unsupported source
      * @throws \DomainException          Unknown index
-     * @throws \LogicException           Duplicated composite for single key
+     * @throws \LogicException           Duplicated composite for single column key
      * @throws \RuntimeException         Syntax error in Foreign Key
      * @throws \LogicException           Multiple AUTO_INCREMENT indexes
      * @throws \LengthException          Column is empty
@@ -128,8 +128,8 @@ class Parser
 
             $table = $tokens[1];
             if ($keywords[$key] == 'single' && isset($indexes[$table][$key])) {
-                $message = 'Duplicated composite for single key on table "'
-                    . $table . '"';
+                $message = 'Duplicated composite for single column key on table'
+                    . " `$table`";
                 throw new \LogicException($message);
             }
 
@@ -173,9 +173,9 @@ class Parser
                 if ($fk !== false) {
                     preg_match($pattern, substr($query, $fk), $matches);
                     if (empty($matches)) {
-                        $mesage = 'Syntax error in Foreign Key on column "'
-                            . $table . '.' . $column . '"';
-                        throw new \RuntimeException($mesage);
+                        $message = 'Syntax error in Foreign Key on column '
+                            . "`$table`.`$column`";
+                        throw new \RuntimeException($message);
                     }
                     $len = strlen($matches[0]);
                     $query = substr_replace($query, '', $fk, $len);
@@ -190,8 +190,7 @@ class Parser
                 if ($result !== false) {
                     $query = $result;
                     if (isset($auto_increment[$table])) {
-                        $message = 'Multiple AUTO_INCREMENT on table "'
-                            . $table . '"';
+                        $message = "Multiple AUTO_INCREMENT on table `$table`";
                         throw new \LogicException($message);
                     }
                     $auto_increment[$table] = $column;
@@ -214,8 +213,7 @@ class Parser
                  */
                 $query = trim($query);
                 if (strlen($query) == 0) {
-                    $message = 'Column "' . $table . '.' . $column
-                        . '" is empty';
+                    $message = "Column `$table`.`$column` is empty";
                     throw new \LengthException($message);
                 }
 
@@ -257,7 +255,7 @@ class Parser
              */
             if (!empty($primary_key)) {
                 if (isset($indexes[$table]['PRIMARY'])) {
-                    $message = 'Multiple PRIMARY KEY on table "' . $table . '"';
+                    $message = "Multiple PRIMARY KEY on table `$table`";
                     throw new \LogicException($message);
                 } else {
                     $indexes[$table]['PRIMARY'] = $primary_key;
