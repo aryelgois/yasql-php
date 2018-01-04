@@ -168,9 +168,9 @@ Example:
 
 ```yaml
 databases:
-- tests/example.yml
-- path: data/mydatabase.yml
-  post: data/mydatabase_populate.sql
+  - tests/example.yml
+  - path: data/mydatabase.yml
+    post: data/mydatabase_populate.sql
 
 indentation: 4
 
