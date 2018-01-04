@@ -51,6 +51,18 @@ class Parser
     ];
 
     /**
+     * Identifier patterns accepted in a SQL
+     *
+     * @see https://dev.mysql.com/doc/refman/5.7/en/identifiers.html
+     *
+     * @var string[]
+     */
+    const IDENTIFIER_PATTERNS = [
+        'unquoted' => '[0-9a-zA-Z$_\x{0080}-\x{FFFF}]',
+        'quoted' => '[\x{0001}-\x{007F}\x{0080}-\x{FFFF}]'
+    ];
+
+    /**
      * The parsed YAML with a database description
      *
      * @var array
@@ -97,18 +109,20 @@ class Parser
                 throw new \DomainException('Unsupported source');
                 break;
         }
-        $qO = $quotes[0]; // Open
-        $qC = $quotes[1]; // Close
+
+        /*
+         * Define identifier patterns
+         */
+        $unquoted = '(' . self::IDENTIFIER_PATTERNS['unquoted'] . '+)';
+        $quoted = $quotes[0]
+            . '(' . self::IDENTIFIER_PATTERNS['quoted'] . '+)'
+            . $quotes[1];
 
         /*
          * Define Foreign Key pattern
          */
-        $pattern = '/-> ('
-            . '(\w+)\.(\w+)|'
-            . $qO . '(\w+)' . $qC . '\.(\w+)|'
-            . '(\w+)\.' . $qO . '(\w+)' . $qC . '|'
-            . $qO . '(\w+)' . $qC . '\.' . $qO . '(\w+)' . $qC
-            . ')/';
+
+        $pattern = "/-> ($unquoted *\. *$unquoted|$quoted *\. *$unquoted|$unquoted *\. *$quoted|$quoted *\. *$quoted)( |$)/u";
 
         /*
          * Expand composite
@@ -188,8 +202,8 @@ class Parser
                         throw new \RuntimeException($message);
                     }
                     $len = strlen($matches[0]);
-                    $query = substr_replace($query, '', $fk, $len);
-                    $matches = array_slice($matches, -2, 2);
+                    $query = trim(substr_replace($query, '', $fk, $len));
+                    $matches = array_slice(array_filter($matches), 2, 2);
                     $foreigns[$table][$column] = $matches;
                 }
 
