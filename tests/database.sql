@@ -1,12 +1,12 @@
 -- Generated with yasql-php
 -- https://github.com/aryelgois/yasql-php
 --
--- Timestamp: 2017-12-22T11:30:05-02:00
+-- Timestamp: 2018-01-04T19:33:19-02:00
 -- PHP version: 7.0.22-0ubuntu0.16.04.1
 --
 -- Project: aryelgois/yasql
 -- Description: A YASQL database example
--- Version: 1.0.0
+-- Version: 1.0.1
 -- License: MIT
 -- Authors: Aryel
 
