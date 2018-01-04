@@ -17,5 +17,9 @@
         "psr-4": {
             "aryelgois\\YaSql\\": "src/"
         }
+    },
+    "scripts": {
+        "yasql-build": "aryelgois\\YaSql\\Composer::build",
+        "yasql-generate": "aryelgois\\YaSql\\Composer::generate"
     }
 }
