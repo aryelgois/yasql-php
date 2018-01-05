@@ -105,7 +105,7 @@ class Builder
                         foreach ((array) $post['with'] as $with) {
                             $obj->load($with);
                             $post_sql .= "--\n-- With '" . basename($with)
-                                . "'\n--\n\n" . $obj->run() . "\n";
+                                . "'\n--\n\n" . trim($obj->run()) . "\n\n";
                         }
                     } else {
                         $post = $root . '/' . $post;
