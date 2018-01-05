@@ -20,13 +20,18 @@ class Controller
     /**
      * Builds database schemas into a directory
      *
-     * @param string $root   Path to project root directory
-     * @param string $output Path to output directory
-     * @param string $config Path to config file
+     * @param string $root    Path to project root directory
+     * @param string $output  Path to output directory
+     * @param string $config  Path to config file
+     * @param string $vendors Path to vendors directory
      */
-    public static function build(string $root, string $output, string $config)
-    {
-        $builder = new Builder($output);
+    public static function build(
+        string $root,
+        string $output,
+        string $config,
+        string $vendor = null
+    ) {
+        $builder = new Builder($output, $vendor);
 
         try {
             $builder->build($config, $root);

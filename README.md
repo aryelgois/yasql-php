@@ -91,7 +91,7 @@ _(see how to configure the commands in **Setup**)_
 
 This class wrapps others, to make them easier to use.
 
-- _static_ **build(** [string] $root , [string] $output , [string] $config **)**
+- _static_ **build(** [string] $root , [string] $output , [string] $config [, [string] $vendors] **)**
 
   Use this method to build your databases into a specific directory.  
   (see **Builder**)

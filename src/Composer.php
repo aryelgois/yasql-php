@@ -42,7 +42,8 @@ class Composer
         Controller::build(
             getcwd(),
             $args[0],
-            $args[1] ?? 'config/databases.yml'
+            $args[1] ?? 'config/databases.yml',
+            self::getVendorDir($event)
         );
     }
 
@@ -65,5 +66,17 @@ class Composer
         }
 
         echo Controller::generate(file_get_contents($args[0]), $args[1] ?? 2);
+    }
+
+    /**
+     * Gets Composer's vendor dir
+     *
+     * @param Event $event Composer run-script event
+     *
+     * @return string Path to Vendor Directory
+     */
+    protected static function getVendorDir(Event $event)
+    {
+        return $event->getComposer()->getConfig()->get('vendor-dir');
     }
 }
