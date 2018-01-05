@@ -7,8 +7,6 @@
 
 namespace aryelgois\YaSql;
 
-use Composer\Script\Event;
-
 /**
  * Create SQL database schemas with YAML
  *
@@ -22,29 +20,18 @@ class Controller
     /**
      * Builds database schemas into a directory
      *
-     * Use it with Composer's run-script. An argument pointing to the config
-     * file (relative to the package root) is required.
-     *
-     * @param Event $event Composer run-script event
+     * @param string $root    Path to project root directory
+     * @param string $output  Path to output directory
+     * @param string $config  Path to config file
+     * @param string $vendors Path to vendors directory
      */
-    public static function build(Event $event)
-    {
-        $args = $event->getArguments();
-
-        if (empty($args)) {
-            echo "Usage:\n\n"
-               . "composer yasql-builder -- OUTPUT_DIR [CONFIG_FILE]\n\n"
-               . "By default, CONFIG_FILE is in `config/databases.yml`\n";
-            die(1);
-        }
-
-        $output = $args[0];
-        $vendors = $event->getComposer()->getConfig()->get('vendor-dir');
-
-        $builder = new Builder($output);
-
-        $root = getcwd();
-        $config = $args[1] ?? 'config/databases.yml';
+    public static function build(
+        string $root,
+        string $output,
+        string $config,
+        string $vendor = null
+    ) {
+        $builder = new Builder($output, $vendor);
 
         try {
             $builder->build($config, $root);
@@ -52,7 +39,7 @@ class Controller
         catch (Exception $e) {
             throw $e;
         } finally {
-            echo $builder->getLog() . "\n";
+            echo $builder->getLog();
         }
     }
 

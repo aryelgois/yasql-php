@@ -1,0 +1,3 @@
+databases:
+  - tests/databases/example.yml
+  - tests/databases/Uncommon-db.yml

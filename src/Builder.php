@@ -56,11 +56,12 @@ class Builder
         $this->output = realpath($output);
         $this->vendors = realpath($vendors ?? 'vendor');
 
-        $this->log = [
-            'Build start: ' . date('c'),
-            'Output: ' . $this->output,
-            '',
-        ];
+        $this->log = 'Build start: ' . date('c') . "\n"
+            . "Output: $this->output\n\n";
+
+        if ($this->vendors === false) {
+            $this->log .= "N: Could not find vendors dir\n\n";
+        }
     }
 
     /**
@@ -74,18 +75,18 @@ class Builder
         $root = $root ?? getcwd();
 
         $config = $root . '/' . $config;
-        $this->log[] = 'Load config file ' . $config;
+        $this->log .= "Load config file $config\n";
         $config = Yaml::parse(file_get_contents($config));
         $indent = $config['indentation'] ?? null;
 
         $databases = $config['databases'] ?? [];
         if (!empty($databases)) {
-            $generated = [];
+            $generated = '';
             foreach ($config['databases'] as $database) {
                 $path = $root . '/' . ($database['path'] ?? $database);
                 $file = realpath($path);
                 if ($file === false) {
-                    $this->log[] = 'E: Database "' . $path . '" not found';
+                    $this->log .= "E: Database '$path' not found\n";
                     continue;
                 }
                 $sql = Controller::generate(file_get_contents($file), $indent);
@@ -94,69 +95,46 @@ class Builder
                 foreach ($post_list as $post) {
                     if (is_array($post)) {
                         $post_name = $class = $post['call'];
-                        if (is_subclass_of($class, Populator::class)) {
-                            $obj = new $class($root);
-                            $result = [];
-                            foreach ((array) $post['with'] as $with) {
-                                $obj->load($with);
-                                $result = array_merge(
-                                    $result,
-                                    [
-                                        '--',
-                                        "-- With '" . basename($with) . "'",
-                                        '--',
-                                        '',
-                                        $obj->run(),
-                                    ]
-                                );
-                            }
-                            $post = implode("\n", $result);
-                        } else {
-                            $this->log[] = 'E: Class "' . $class
-                                . '" does not extend ' . Populator::class;
-                            $post = null;
+                        if (!is_subclass_of($class, Populator::class)) {
+                            $this->log .= "E: Class '$class' does not extend "
+                                . Populator::class . "\n";
+                            continue;
+                        }
+                        $obj = new $class($root);
+                        $post_sql = '';
+                        foreach ((array) $post['with'] as $with) {
+                            $obj->load($with);
+                            $post_sql .= "--\n-- With '" . basename($with)
+                                . "'\n--\n\n" . trim($obj->run()) . "\n\n";
                         }
                     } else {
                         $post = $root . '/' . $post;
                         $post_file = realpath($post);
-                        if ($post_file !== false) {
-                            $post_name = basename($post);
-                            $post = file_get_contents($post_file);
-                        } else {
-                            $this->log[] = 'W: Post file "' . $post
-                                . '" not found';
-                            $post = null;
+                        if ($post_file === false) {
+                            $this->log .= "W: Post file '$post' not found\n";
+                            continue;
                         }
+                        $post_name = basename($post);
+                        $post_sql = file_get_contents($post_file);
                     }
-                    if (!is_null($post)) {
-                        $sql .= "\n--\n-- Post '" . $post_name . "'"
-                              . "\n--\n\n"
-                              . $post;
-                    }
+                    $sql .= "\n--\n-- Post '$post_name'\n--\n\n"
+                        . trim($post_sql) . "\n";
                 }
 
                 $outfile = basename(substr($file, 0, strrpos($file, '.')))
                          . '.sql';
                 file_put_contents($this->output . '/' . $outfile, $sql);
-                $generated[] = '- ' . $outfile;
+                $generated .= "- $outfile\n";
             }
 
-            $this->log = array_merge(
-                $this->log,
-                ['Files generated:'],
-                $generated
-            );
+            $this->log .= "Files generated:\n$generated";
         }
 
+        if ($this->vendors === false) {
+            return;
+        }
         foreach ($config['vendors'] ?? [] as $vendor => $vendor_configs) {
-            $this->log = array_merge(
-                $this->log,
-                [
-                    '',
-                    'Switch to vendor ' . $vendor,
-                    '',
-                ]
-            );
+            $this->log .= "\nSwitch to vendor $vendor\n\n";
 
             if (is_null($vendor_configs)) {
                 $vendor_configs = [null];
@@ -178,6 +156,6 @@ class Builder
      */
     public function getLog()
     {
-        return implode("\n", $this->log);
+        return $this->log;
     }
 }
