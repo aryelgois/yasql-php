@@ -229,6 +229,22 @@ class Parser
                 /*
                  * Extract keywords
                  */
+                $result = self::extractKeyword($query, 'UNSIGNED');
+                if ($result !== false) {
+                    $query = $result;
+                    $unsigned = true;
+                } else {
+                    $unsigned = false;
+                }
+
+                $result = self::extractKeyword($query, 'ZEROFILL');
+                if ($result !== false) {
+                    $query = $result;
+                    $zerofill = ' ZEROFILL';
+                } else {
+                    $zerofill = '';
+                }
+
                 $result = self::extractKeyword($query, 'AUTO_INCREMENT');
                 if ($result !== false) {
                     $query = $result;
@@ -266,15 +282,14 @@ class Parser
                 /*
                  * YASQL keywords
                  */
-                $sign = strpos($query, '+');
-                if ($sign === false) {
-                    if (self::strContains($query, self::NUMERIC_TYPES)) {
-                        if (stripos($query, 'UNSIGNED') === false) {
-                            $query .= ' UNSIGNED';
-                        }
+                if (self::strContains($query, self::NUMERIC_TYPES)) {
+                    $sign = strpos($query, '+');
+                    if ($sign !== false) {
+                        $query = substr_replace($query, '', $sign, 1);
+                    } elseif ($sign === false || $unsigned) {
+                        $query .= ' UNSIGNED';
                     }
-                } else {
-                    $query = substr_replace($query, '', $sign, 1);
+                    $query .= $zerofill;
                 }
 
                 $result = self::extractKeyword(
