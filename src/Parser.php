@@ -176,15 +176,25 @@ class Parser
         }
 
         /*
-         * Loop through each column
+         * Prepare variables
          */
+        $quote_map = array_combine($quotes, $quotes_escaped);
+
         $tables = $data['tables'] ?? [];
+        $tables_new = [];
+
         $definitions = $data['definitions'] ?? [];
         $auto_increment = [];
         $foreigns = [];
+
+        /*
+         * Loop through each column
+         */
         foreach ($tables as $table => $columns) {
+            $table = self::escapeQuotes($table, $quote_map);
             $primary_key = [];
             foreach ($columns as $column => $query) {
+                $column = self::escapeQuotes($column, $quote_map);
                 /*
                  * Pre validation
                  */
@@ -322,7 +332,7 @@ class Parser
                 /*
                  * Store
                  */
-                $tables[$table][$column] = $query;
+                $tables_new[$table][$column] = $query;
             }
 
             /*
@@ -346,13 +356,26 @@ class Parser
         /*
          * Update data and store
          */
-        $data['tables'] = $tables;
+        $data['tables'] = $tables_new;
         unset($data['composite'], $data['definitions']);
         $data['auto_increment'] = $auto_increment;
         $data['indexes'] = $indexes;
         $data['foreigns'] = $foreigns;
 
         $this->data = $data;
+    }
+
+    /**
+     * Escapes quotes in identifiers
+     *
+     * @param string   $subject   Identifier to escape
+     * @param string[] $quote_map Map of Quote to its SQL escaped form
+     *
+     * @return string
+     */
+    protected function escapeQuotes(string $subject, array $quote_map)
+    {
+        return str_replace(array_keys($quote_map), $quote_map, $subject);
     }
 
     /**
