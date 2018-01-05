@@ -91,44 +91,30 @@ class Builder
                 foreach ($post_list as $post) {
                     if (is_array($post)) {
                         $post_name = $class = $post['call'];
-                        if (is_subclass_of($class, Populator::class)) {
-                            $obj = new $class($root);
-                            $result = [];
-                            foreach ((array) $post['with'] as $with) {
-                                $obj->load($with);
-                                $result = array_merge(
-                                    $result,
-                                    [
-                                        '--',
-                                        "-- With '" . basename($with) . "'",
-                                        '--',
-                                        '',
-                                        $obj->run(),
-                                    ]
-                                );
-                            }
-                            $post = implode("\n", $result);
-                        } else {
+                        if (!is_subclass_of($class, Populator::class)) {
                             $this->log .= "E: Class '$class' does not extend "
                                 . Populator::class . "\n";
-                            $post = null;
+                            continue;
+                        }
+                        $obj = new $class($root);
+                        $post_sql = '';
+                        foreach ((array) $post['with'] as $with) {
+                            $obj->load($with);
+                            $post_sql .= "--\n-- With '" . basename($with)
+                                . "'\n--\n\n" . $obj->run() . "\n";
                         }
                     } else {
                         $post = $root . '/' . $post;
                         $post_file = realpath($post);
-                        if ($post_file !== false) {
-                            $post_name = basename($post);
-                            $post = file_get_contents($post_file);
-                        } else {
+                        if ($post_file === false) {
                             $this->log .= "W: Post file '$post' not found\n";
-                            $post = null;
+                            continue;
                         }
+                        $post_name = basename($post);
+                        $post_sql = file_get_contents($post_file);
                     }
-                    if (!is_null($post)) {
-                        $sql .= "\n--\n-- Post '" . $post_name . "'"
-                              . "\n--\n\n"
-                              . $post;
-                    }
+                    $sql .= "\n--\n-- Post '$post_name'\n--\n\n"
+                        . trim($post_sql) . "\n";
                 }
 
                 $outfile = basename(substr($file, 0, strrpos($file, '.')))
