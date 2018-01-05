@@ -125,7 +125,6 @@ class Parser
         /*
          * Define Foreign Key pattern
          */
-
         $pattern = "/-> ($unquoted *\. *$unquoted|$quoted *\. *$unquoted|$unquoted *\. *$quoted|$quoted *\. *$quoted)( |$)/u";
 
         /*
@@ -280,7 +279,7 @@ class Parser
                 }
 
                 /*
-                 * YASQL keywords
+                 * Start to reconstruct
                  */
                 if (self::strContains($query, self::NUMERIC_TYPES)) {
                     $sign = strpos($query, '+');
