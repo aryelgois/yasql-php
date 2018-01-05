@@ -58,6 +58,10 @@ class Builder
 
         $this->log = 'Build start: ' . date('c') . "\n"
             . "Output: $this->output\n\n";
+
+        if ($this->vendors === false) {
+            $this->log .= "N: Could not find vendors dir\n\n";
+        }
     }
 
     /**
@@ -126,6 +130,9 @@ class Builder
             $this->log .= "Files generated:\n$generated";
         }
 
+        if ($this->vendors === false) {
+            return;
+        }
         foreach ($config['vendors'] ?? [] as $vendor => $vendor_configs) {
             $this->log .= "\nSwitch to vendor $vendor\n\n";
 
