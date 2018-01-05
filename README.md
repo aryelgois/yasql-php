@@ -33,12 +33,13 @@ _(see specifications in **Builder**)_
 
 # Usage
 
-## Builder
+#### yasql-build
 
 Create databases following the [YASQL][aryelgois/yasql] schema and add them in
-your `databases.yml`. Then run the following command inside your project root:
+your builder configuration (`databases.yml`). Then run the following command
+inside your project root:
 
-`composer run-script yasql-build -- path/to/output [path/to/config_file.yml]`
+`composer yasql-build -- path/to/output [path/to/config_file.yml]`
 
 > **NOTE**
 >
@@ -54,12 +55,12 @@ It will create `.sql` files in the output directory, so you can import them into
 your sql server.
 
 
-## Generator
+#### yasql-generate
 
 If you only want to generate the SQL from one YASQL schema, run the following
 command:
 
-`composer run-script yasql-generate -- path/to/yasql.yml [indentation]`
+`composer yasql-generate -- path/to/yasql.yml [indentation]`
 
 It will output to stdout, so you can add something like ` > output_database.sql`
 to write the result in a file. The indentation defaults to 2 spaces.
@@ -154,7 +155,7 @@ This class wrapps others, to make them easier to use.
 
 #### config file
 
-A YAML with a mapping of the following keys: (all are optional)
+A YAML with the following keys: (all are optional)
 
 - `databases`: sequence of files with YASQL database schemas. It can be a
   string or a mapping of the YASQL path and a post sql (or a sequence of post
@@ -205,9 +206,9 @@ databases:
           - data/address/source/Brazil.yml
 ```
 
-The post must map to a sequence, and one of it items is a map of:
+The post must map to a sequence, and the item is a map of:
 
-- `call`: a fully qualified class that extends **Populator**, autoloaded by
+- `call`: a fully qualified class that extends **Populator**, autoloadable by
   Composer
 - `with`: path to a YAML with the data to be processed. It can be a sequence
 
