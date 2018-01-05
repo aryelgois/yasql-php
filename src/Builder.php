@@ -56,11 +56,8 @@ class Builder
         $this->output = realpath($output);
         $this->vendors = realpath($vendors ?? 'vendor');
 
-        $this->log = [
-            'Build start: ' . date('c'),
-            'Output: ' . $this->output,
-            '',
-        ];
+        $this->log = 'Build start: ' . date('c') . "\n"
+            . "Output: $this->output\n\n";
     }
 
     /**
@@ -74,18 +71,18 @@ class Builder
         $root = $root ?? getcwd();
 
         $config = $root . '/' . $config;
-        $this->log[] = 'Load config file ' . $config;
+        $this->log .= "Load config file $config\n";
         $config = Yaml::parse(file_get_contents($config));
         $indent = $config['indentation'] ?? null;
 
         $databases = $config['databases'] ?? [];
         if (!empty($databases)) {
-            $generated = [];
+            $generated = '';
             foreach ($config['databases'] as $database) {
                 $path = $root . '/' . ($database['path'] ?? $database);
                 $file = realpath($path);
                 if ($file === false) {
-                    $this->log[] = 'E: Database "' . $path . '" not found';
+                    $this->log .= "E: Database '$path' not found\n";
                     continue;
                 }
                 $sql = Controller::generate(file_get_contents($file), $indent);
@@ -112,8 +109,8 @@ class Builder
                             }
                             $post = implode("\n", $result);
                         } else {
-                            $this->log[] = 'E: Class "' . $class
-                                . '" does not extend ' . Populator::class;
+                            $this->log .= "E: Class '$class' does not extend "
+                                . Populator::class . "\n";
                             $post = null;
                         }
                     } else {
@@ -123,8 +120,7 @@ class Builder
                             $post_name = basename($post);
                             $post = file_get_contents($post_file);
                         } else {
-                            $this->log[] = 'W: Post file "' . $post
-                                . '" not found';
+                            $this->log .= "W: Post file '$post' not found\n";
                             $post = null;
                         }
                     }
@@ -138,25 +134,14 @@ class Builder
                 $outfile = basename(substr($file, 0, strrpos($file, '.')))
                          . '.sql';
                 file_put_contents($this->output . '/' . $outfile, $sql);
-                $generated[] = '- ' . $outfile;
+                $generated .= "- $outfile\n";
             }
 
-            $this->log = array_merge(
-                $this->log,
-                ['Files generated:'],
-                $generated
-            );
+            $this->log .= "Files generated:\n$generated";
         }
 
         foreach ($config['vendors'] ?? [] as $vendor => $vendor_configs) {
-            $this->log = array_merge(
-                $this->log,
-                [
-                    '',
-                    'Switch to vendor ' . $vendor,
-                    '',
-                ]
-            );
+            $this->log .= "\nSwitch to vendor $vendor\n\n";
 
             if (is_null($vendor_configs)) {
                 $vendor_configs = [null];
@@ -178,6 +163,6 @@ class Builder
      */
     public function getLog()
     {
-        return implode("\n", $this->log);
+        return $this->log;
     }
 }

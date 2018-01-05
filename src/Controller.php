@@ -34,7 +34,7 @@ class Controller
         catch (Exception $e) {
             throw $e;
         } finally {
-            echo $builder->getLog() . "\n";
+            echo $builder->getLog();
         }
     }
 
