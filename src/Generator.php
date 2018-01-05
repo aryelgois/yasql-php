@@ -39,13 +39,11 @@ class Generator
         /*
          * Generate Header
          */
-        $sql = [
-            '-- Generated with yasql-php',
-            '-- https://github.com/aryelgois/yasql-php',
-            '--',
-            '-- Timestamp: ' . date('c'),
-            '-- PHP version: ' . phpversion(),
-        ];
+        $sql = "-- Generated with yasql-php\n"
+            . "-- https://github.com/aryelgois/yasql-php\n"
+            . "--\n"
+            . '-- Timestamp: ' . date('c') . "\n"
+            . '-- PHP version: ' . phpversion() . "\n";
 
         $header = array_filter([
             'Project'     => $db['project'] ?? '',
@@ -58,46 +56,33 @@ class Generator
             ),
         ]);
         if (!empty($header)) {
-            array_walk($header, function (&$v, $k) {
-                $v = '-- ' . $k . ': ' . $v;
-            });
-            array_unshift($header, '--');
+            $sql .= "--\n";
+            foreach ($header as $k => $v) {
+                $sql .= "-- $k: $v\n";
+            }
         }
 
-        $sql = array_merge($sql, array_values($header), [
-            '',
-            'CREATE DATABASE IF NOT EXISTS `' . $db['name'] . '`',
-            $in . 'CHARACTER SET ' . ($db['charset'] ?? 'utf8'),
-            $in . 'COLLATE ' . ($db['collate'] ?? 'utf8_general_ci') . ';',
-            '',
-            'USE `' . $db['name'] . '`;',
-            '',
-        ]);
+        $sql .= "\n"
+            . "CREATE DATABASE IF NOT EXISTS `{$db['name']}`\n"
+            . $in . 'CHARACTER SET ' . ($db['charset'] ?? 'utf8') . "\n"
+            . $in . 'COLLATE ' . ($db['collate'] ?? 'utf8_general_ci') . ";\n"
+            . "\nUSE `{$db['name']}`;\n\n";
 
         /*
          * Generate SQL
          */
+        $tables = $indexes = $autos = $foreigns = null;
         foreach ($data['tables'] as $table => $columns) {
             /*
              * Add Table
              */
             foreach ($columns as $column => $query) {
-                $columns[$column] = $in . '`' . $column . '` ' . $query;
+                $columns[$column] = "$in`$column` $query";
             }
-            $tables = array_merge(
-                $tables ?? [
-                    '--',
-                    '-- Tables',
-                    '--',
-                    '',
-                ],
-                ['CREATE TABLE `' . $table . '` ('],
-                array_values(Utils::arrayAppendLast($columns, '', ',')),
-                [
-                    ') CHARACTER SET ' . ($db['charset'] ?? 'utf8') . ';',
-                    ''
-                ]
-            );
+            $tables = ($tables ?? "--\n-- Tables\n--\n\n")
+                . "CREATE TABLE `$table` (\n"
+                . implode("\n", Utils::arrayAppendLast($columns, "\n", ','))
+                . ') CHARACTER SET ' . ($db['charset'] ?? 'utf8') . ";\n\n";
 
             /*
              * Add Indexes
@@ -120,17 +105,9 @@ class Generator
                             break;
                     }
                 }
-                $indexes = array_merge(
-                    $indexes ?? [
-                        '--',
-                        '-- Indexes',
-                        '--',
-                        '',
-                    ],
-                    ['ALTER TABLE `' . $table . '`'],
-                    Utils::arrayAppendLast($id, ';', ','),
-                    ['']
-                );
+                $indexes = ($indexes ?? "--\n-- Indexes\n--\n\n")
+                    . "ALTER TABLE `$table`\n"
+                    . implode("\n", Utils::arrayAppendLast($id, ";\n\n", ','));
             }
 
             /*
@@ -138,23 +115,14 @@ class Generator
              */
             $foreign_list = $data['foreigns'][$table] ?? [];
             if (!empty($foreign_list)) {
-                $f = [];
+                $fk = [];
                 foreach ($foreign_list as $column => $foreign) {
-                    $f[] = $in . 'ADD FOREIGN KEY (`' . $column . '`) '
-                        . 'REFERENCES `' . $foreign[0]
-                        . '` (`' . $foreign[1] . '`)';
+                    $fk[] = $in . "ADD FOREIGN KEY (`$column`) REFERENCES"
+                        . " `{$foreign[0]}` (`{$foreign[1]}`)";
                 }
-                $foreigns = array_merge(
-                    $foreigns ?? [
-                        '--',
-                        '-- Foreigns',
-                        '--',
-                        '',
-                    ],
-                    ['ALTER TABLE `' . $table . '`'],
-                    Utils::arrayAppendLast($f, ';', ','),
-                    ['']
-                );
+                $foreigns = ($foreigns ?? "--\n-- Foreigns\n--\n\n")
+                    . "ALTER TABLE `$table`\n"
+                    . implode("\n", Utils::arrayAppendLast($fk, ";\n\n", ','));
             }
         }
 
@@ -162,31 +130,13 @@ class Generator
          * Add AUTO_INCREMENT
          */
         foreach ($data['auto_increment'] ?? [] as $table => $column) {
-            $auto_increments = array_merge(
-                $auto_increments ?? [
-                    '--',
-                    '-- AUTO_INCREMENT',
-                    '--',
-                    '',
-                ],
-                [
-                    'ALTER TABLE `' . $table . '`',
-                    $in . 'MODIFY `' . $column . '` ' .
-                    $data['tables'][$table][$column] . ' AUTO_INCREMENT;',
-                    ''
-                ]
-            );
+            $autos = ($autos ?? "--\n-- AUTO_INCREMENT\n--\n\n")
+                . "ALTER TABLE `$table`\n"
+                . $in . "MODIFY `$column` "
+                . $data['tables'][$table][$column] . " AUTO_INCREMENT;\n\n";
         }
 
-        $sql = array_merge(
-            $sql,
-            $tables ?? [],
-            $indexes ?? [],
-            $auto_increments ?? [],
-            $foreigns ?? []
-        );
-
-        $this->sql = implode("\n", $sql);
+        $this->sql = $sql . $tables . $indexes . $autos . $foreigns;
     }
 
     /**
@@ -196,6 +146,6 @@ class Generator
      */
     public function output()
     {
-        return $this->sql;
+        return trim($this->sql) . "\n";
     }
 }
