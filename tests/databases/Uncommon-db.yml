@@ -1,0 +1,14 @@
+database:
+  name: Uncommon-db
+  license: MIT
+
+tables:
+  multi word table:
+    column`with`quotes: int PRIMARY
+
+  ":D":
+    kill me: int -> `multi word table`.`column``with``quotes`
+    please: int
+
+composite:
+  - PRIMARY `:D` `kill me` please
