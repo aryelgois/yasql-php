@@ -39,6 +39,7 @@ class Parser
      * @var string
      */
     const INDEX_KEYWORDS = [
+        'INDEX' => 'multiple',
         'PRIMARY' => 'single',
         'UNIQUE' => 'multiple',
     ];
@@ -274,6 +275,12 @@ class Parser
                 if ($result !== false) {
                     $query = $result;
                     $indexes[$table]['UNIQUE'][] = [$column];
+                }
+
+                $result = self::extractKeyword($query, '(INDEX|KEY)');
+                if ($result !== false) {
+                    $query = $result;
+                    $indexes[$table]['INDEX'][] = $column;
                 }
 
                 $result = self::extractKeyword(

@@ -97,9 +97,10 @@ class Generator
                                 . implode('`, `', $index) . '`)';
                             break;
 
+                        case 'INDEX':
                         case 'UNIQUE':
                             foreach ($index as $column) {
-                                $id[] = $in . 'ADD UNIQUE KEY (`'
+                                $id[] = $in . "ADD $key KEY (`"
                                     . implode('`, `', $column) . '`)';
                             }
                             break;
