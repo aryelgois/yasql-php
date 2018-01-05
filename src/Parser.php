@@ -78,6 +78,7 @@ class Parser
      * @throws \RuntimeException         Missing Database name
      * @throws \DomainException          Unsupported source
      * @throws \DomainException          Unknown index
+     * @throws \LogicException           Missing composite identifiers
      * @throws \LogicException           Duplicated composite for single column key
      * @throws \LengthException          Missing column definition
      * @throws \RuntimeException         Syntax error in Foreign Key
@@ -102,7 +103,8 @@ class Parser
         $source = $data['database']['source'] ?? 'MySQL';
         switch ($source) {
             case 'MySQL':
-                $quotes = '``';
+                $quotes = ['`', '`'];
+                $quotes_escaped = ['``', '``'];
                 break;
 
             default:
@@ -115,7 +117,9 @@ class Parser
          */
         $unquoted = '(' . self::IDENTIFIER_PATTERNS['unquoted'] . '+)';
         $quoted = $quotes[0]
-            . '(' . self::IDENTIFIER_PATTERNS['quoted'] . '+)'
+            . '((?:(?![' . implode('', $quotes) . '])'
+            . self::IDENTIFIER_PATTERNS['quoted']
+            . '|' . $quotes_escaped[0] . '|' . $quotes_escaped[1] . ')+)'
             . $quotes[1];
 
         /*
@@ -128,32 +132,47 @@ class Parser
          * Expand composite
          */
         $indexes = [];
-        $keywords = self::INDEX_KEYWORDS;
+        $id_keys = self::INDEX_KEYWORDS;
         foreach ($data['composite'] ?? [] as $composite) {
-            $tokens = explode(' ', $composite);
-            if ($tokens[1] == 'KEY') {
-                unset($tokens[1]);
-                $tokens = array_values($tokens);
-            }
-
-            $key = strtoupper($tokens[0]);
-            if (!array_key_exists($key, $keywords)) {
+            $result = self::extractKeyword(
+                $composite,
+                '^((' . implode('|', array_keys($id_keys)) . ')( KEY|))',
+                $type
+            );
+            if ($result !== false) {
+                $key = $type[2][0];
+            } else {
+                $key = explode(' ', $composite)[0];
                 throw new \DomainException("Unknown index '$key'");
             }
 
-            $table = $tokens[1];
-            if ($keywords[$key] == 'single' && isset($indexes[$table][$key])) {
+            if (preg_match_all(
+                "/($quoted|$unquoted)/u",
+                $result,
+                $matches,
+                PREG_SET_ORDER
+            )) {
+                $identifiers = [];
+                foreach ($matches as $match) {
+                    $match = array_filter($match);
+                    $identifiers[] = array_pop($match);
+                }
+            } else {
+                $message = "Missing identifiers in composite '$composite'";
+                throw new \LogicException($message);
+            }
+
+            $table = array_shift($identifiers);
+            if ($id_keys[$key] == 'single' && isset($indexes[$table][$key])) {
                 $message = 'Duplicated composite for single column key on table'
                     . " `$table`";
                 throw new \LogicException($message);
             }
 
-            $columns = array_slice($tokens, 2);
-
-            if ($keywords[$key] == 'multiple') {
-                $indexes[$table][$key][] = $columns;
+            if ($id_keys[$key] == 'multiple') {
+                $indexes[$table][$key][] = $identifiers;
             } else {
-                $indexes[$table][$key] = $columns;
+                $indexes[$table][$key] = $identifiers;
             }
         }
 
