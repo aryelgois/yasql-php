@@ -32,7 +32,7 @@ class Generator
     {
         $data = $parser->getData();
 
-        $in = str_repeat(' ', $indent ?? 2);
+        $in = str_repeat(' ', max(0, $indent ?? 2));
 
         $db = $data['database'];
 
