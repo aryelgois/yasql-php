@@ -18,6 +18,7 @@ use Composer\Script\Event;
  *
  * @author Aryel Mota Góis
  * @license MIT
+ * @link https://www.github.com/aryelgois/yasql-php
  */
 class Composer
 {
