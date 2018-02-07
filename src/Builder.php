@@ -131,11 +131,10 @@ class Builder
                 }
 
                 $outfile = basename(substr($file, 0, strrpos($file, '.')))
-                         . '.sql';
+                    . '.sql';
                 file_put_contents($this->output . '/' . $outfile, $sql);
                 $generated .= "- $outfile\n";
             }
-
             $this->log .= "Files generated:\n$generated";
         }
 
@@ -149,7 +148,7 @@ class Builder
         foreach ($vendors as $vendor => $vendor_configs) {
             $this->log .= "\nSwitch to vendor $vendor\n\n";
 
-            if (is_null($vendor_configs)) {
+            if ($vendor_configs === null) {
                 $vendor_configs = [null];
             }
 
