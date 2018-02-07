@@ -1,3 +1,22 @@
+Index:
+
+- [Intro]
+- [Install]
+- [Setup]
+- [Usage]
+  - [yasql-build]
+  - [yasql-generate]
+- [API]
+  - [Composer]
+  - [Controller]
+  - [Parser]
+  - [Generator]
+  - [Builder]
+    - [config file]
+  - [Populator]
+  - [Utils]
+
+
 # Intro
 
 This is a PHP implementation for **YAML Ain't SQL**, whose specification can be
@@ -124,7 +143,7 @@ This class wrapps others, to make them easier to use.
 
 ## Generator
 
-- **__construct(** [Parser] $parser \[, [int] $indent \] **)**
+- **__construct(** [Parser][parser-class] $parser \[, [int] $indent \] **)**
 
   Produces SQL to create the database. It asks for a Parser to ensure the data
   is valid.
@@ -225,10 +244,26 @@ used by whoever require this package.
   and a semicolon at the last item.
 
 
+[Setup]: #setup
+[Intro]: #intro
+[Install]: #install
+[Setup]: #setup
+[Usage]: #usage
+[yasql-build]: #yasql-build
+[yasql-generate]: #yasql-generate
+[API]: #api
+[Composer]: #composer
+[Controller]: #controller
+[Parser]: #parser
+[Generator]: #generator
+[Builder]: #builder
+[config file]: #config-file
+[Populator]: #populator
+[Utils]: #utils
 [aryelgois/yasql]: https://github.com/aryelgois/yasql
 [aryelgois/databases]: https://github.com/aryelgois/databases
 [Event]: https://getcomposer.org/apidoc/master/Composer/Script/Event.html
 [array]: https://secure.php.net/manual/en/language.types.array.php
 [int]: https://secure.php.net/manual/en/language.types.integer.php
 [string]: https://secure.php.net/manual/en/language.types.string.php
-[Parser]: src/Parser.php
+[parser-class]: src/Parser.php
