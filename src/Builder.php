@@ -110,6 +110,9 @@ class Builder
                         $obj = new $class();
                         $post_sql = '';
                         foreach ((array) $post['with'] as $with) {
+                            if ($with[0] !== '/') {
+                                $with = dirname($config_path) . '/' . $with;
+                            }
                             $obj->load($with);
                             $post_sql .= "--\n-- With '" . basename($with)
                                 . "'\n--\n\n" . trim($obj->run()) . "\n\n";
