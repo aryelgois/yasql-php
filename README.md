@@ -89,8 +89,11 @@ command:
 
 `composer yasql-generate -- path/to/yasql.yml [ indentation ]`
 
+The first argument is the path to a YASQL file, the second is a optional
+indentation to be used (default is 2 spaces).
+
 It will output to stdout, so you can add something like ` > output_database.sql`
-to write the result in a file. The indentation defaults to 2 spaces.
+to write the result in a file.
 
 
 # API
@@ -102,17 +105,15 @@ under the namespace `aryelgois\YaSql`.
 ## Composer
 
 Provides Composer scripts to use this package from the command line.  
-_(see how to configure the commands in **Setup**)_
+_(see how to configure the commands in [Setup])_
 
 - _static_ **build(** [Event] $event **)**
 
-  It receives an argument with the path to output directory and a optional
-  config file (defaults to `config/databases.yml`).
+  It accepts arguments described in [yasql-build].
 
 - _static_ **generate(** [Event] $event **)**
 
-  The first argument is the path to a YASQL file, the second is a optional
-  indentation to be used (default is 2 spaces).
+  It accepts arguments described in [yasql-generate].
 
 
 ## Controller
