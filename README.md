@@ -260,10 +260,14 @@ used by whoever require this package.
 [config file]: #config-file
 [Populator]: #populator
 [Utils]: #utils
+
+[parser-class]: src/Parser.php
+
 [aryelgois/yasql]: https://github.com/aryelgois/yasql
 [aryelgois/databases]: https://github.com/aryelgois/databases
+
 [Event]: https://getcomposer.org/apidoc/master/Composer/Script/Event.html
+
 [array]: https://secure.php.net/manual/en/language.types.array.php
 [int]: https://secure.php.net/manual/en/language.types.integer.php
 [string]: https://secure.php.net/manual/en/language.types.string.php
-[parser-class]: src/Parser.php
