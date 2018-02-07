@@ -84,8 +84,10 @@ class Composer
     /**
      * Generates the SQL from a YASQL file
      *
-     * @argument string $1 Path to YASQL file
-     * @argument int    $2 How many spaces per indentation level
+     * Arguments:
+     *
+     *    string $1 Path to YASQL file
+     *    int    $2 How many spaces per indentation level
      *
      * @param Event $event Composer run-script event
      */
