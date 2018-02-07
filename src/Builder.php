@@ -34,6 +34,13 @@ class Builder
     protected $output;
 
     /**
+     * List of configs already read
+     *
+     * @var string[]
+     */
+    protected $track = [];
+
+    /**
      * Path to vendors directory
      *
      * @var string|false
@@ -79,6 +86,12 @@ class Builder
     public function build(string $config, array $vendors = null)
     {
         $config_path = realpath($config);
+        if (in_array($config_path, $this->track)) {
+            $this->log .= "Skiping repeated config file '$config_path'\n";
+            return;
+        }
+        $this->track[] = $config_path;
+
         $this->log .= "Load config file '$config_path'\n";
         $config = Yaml::parse(file_get_contents($config_path));
         $indent = $config['indentation'] ?? null;
