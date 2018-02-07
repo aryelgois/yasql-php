@@ -58,12 +58,14 @@ First, create databases following the [YASQL][aryelgois/yasql] schema and list
 them in your [config file]. Then run the following command in your project root:
 
 ```sh
-composer yasql-build -- [ config=path/to/config_file.yml ]
+composer yasql-build -- [ config=path/to/config_file.yml | -c ]
                         [ output=path/to/output/ ]
                         [ vendor=vendor/package ]
 ```
 
 - `config`: Lists YASQL databases to be built and vendors to include
+  - The `-c` flag indicates that you do not want any config file. It is useful
+    when using `vendor` arguments. It is the same as `config=''`
 - `output`: Directory where files are generated
 - `vendor`: Additional vendor to include (using default config file location)
 

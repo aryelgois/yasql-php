@@ -42,10 +42,12 @@ class Composer
 
         foreach ($args as $arg) {
             $tokens = explode('=', $arg, 2);
-            if (count($tokens) == 1) {
+            if (count($tokens) == 1 && $arg[0] !== '-') {
                 throw new \InvalidArgumentException("Invalid argument '$arg'");
             }
             switch ($tokens[0]) {
+                case '-c':
+                    $tokens[1] = '';
                 case 'config':
                     if ($config === null) {
                         $config = $tokens[1];
@@ -71,6 +73,11 @@ class Composer
                     throw new \DomainException($message);
                     break;
             }
+        }
+
+        if ($config == '' && count($vendors) == 0) {
+            echo "Nothing to do.\n";
+            die(1);
         }
 
         Controller::build(
