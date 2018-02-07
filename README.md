@@ -164,17 +164,16 @@ This class wrapps others, to make them easier to use.
 
 ## Builder
 
-- **__construct(** [string] $output \[, [string] $vendors \] **)**
+- **__construct(** \[ [string] $output \[, [string] $vendors \] \] **)**
 
   Creates a new Builder object. Databases will go into `$output`, and vendors
-  are searched in `$vendors`. Both paths can be absolut or relative, and the
-  latter is by default `vendor` in the current working directory.
+  are searched in `$vendors`. Both paths can be absolut or relative, and default
+  to `build/` and `vendor/` in the current working directory, respectively.
 
-- **build(** [string] $config \[, [string] $root \] **)**
+- **build(** [string] $config **)**
 
-  Generates a list of databases from the filesystem into the object's output
-  directory. The paths are relative to `$root`, which is the current working
-  directory by default.
+  Generates a list of databases listed in `$config` file into the object's
+  output directory.
 
 - **getLog()**
 
