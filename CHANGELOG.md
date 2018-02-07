@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+
+## [0.4.0-alpha] - 2018-02-07
+
 ### Added
 - GitHub link
 - Changelog file
@@ -19,8 +22,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
 - API
 
-### Deprecated
-
 ### Removed
 - .gitattributes, that made composer.lock binary
 - `Populator->root` property
@@ -28,8 +29,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 - Issue [#2][issues/2]
 - Typo
-
-### Security
 
 
 ## [0.3.1] - 2018-01-05
@@ -89,7 +88,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Test database and script
 
 
-[Unreleased]: https://github.com/aryelgois/yasql-php/compare/v0.3.1...develop
+[Unreleased]: https://github.com/aryelgois/yasql-php/compare/v0.4.0-pre...develop
+[0.4.0-alpha]: https://github.com/aryelgois/yasql-php/compare/v0.3.1...v0.4.0-alpha
 [0.3.1]: https://github.com/aryelgois/yasql-php/compare/v0.3...v0.3.1
 [0.3]: https://github.com/aryelgois/yasql-php/compare/v0.2...v0.3
 [0.2]: https://github.com/aryelgois/yasql-php/compare/v0.1...v0.2
