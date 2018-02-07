@@ -120,12 +120,12 @@ _(see how to configure the commands in [Setup])_
 
 This class wrapps others, to make them easier to use.
 
-- _static_ **build(** [string] $output , [string] $config , [string] $vendor \[, [array] $vendors \] **)**
+- _static_ **build(** [string] $output , [string] $config , [string] $vendor [, [array] $vendors ] **)**
 
   Use this method to build your databases into a specific directory.  
   _(see [Builder])_
 
-- _static_ **generate(** [string] $yasql \[, [int] $indent \] **)**
+- _static_ **generate(** [string] $yasql [, [int] $indent ] **)**
 
   Use this to generate the SQL from a YASQL and get the result in a string.  
   _(see [Generator])_
@@ -152,7 +152,7 @@ This class wrapps others, to make them easier to use.
 
 ## Generator
 
-- **__construct(** [Parser][parser-class] $parser \[, [int] $indent \] **)**
+- **__construct(** [Parser][parser-class] $parser [, [int] $indent ] **)**
 
   Produces SQL that generates a database. It asks for a Parser object to ensure
   the data is valid.
@@ -164,13 +164,13 @@ This class wrapps others, to make them easier to use.
 
 ## Builder
 
-- **__construct(** \[ [string] $output \[, [string] $vendor \] \] **)**
+- **__construct(** [ [string] $output [, [string] $vendor ] ] **)**
 
   Creates a new Builder object. Databases will go into `$output`, and vendors
   are searched in `$vendors`. Both paths can be absolut or relative, and default
   to `build/` and `vendor/` in the current working directory, respectively.
 
-- **build(** [string] $config \[, [array] $vendors \] **)**
+- **build(** [string] $config [, [array] $vendors ] **)**
 
   Generates a list of databases listed in `$config` file into the object's
   output directory.
@@ -246,7 +246,7 @@ The post must map to a sequence, and the desired item is a map of:
 There is also a class with utility methods. They are used internally and can be
 used by whoever requires this package.
 
-- **arrayAppendLast(** [array] $array , [string] $last \[, [string] $others \] **)**
+- **arrayAppendLast(** [array] $array , [string] $last [, [string] $others ] **)**
 
   Appends a string to the last item. Optionally, appends a string to the others.
   It is useful to generate sql statements with a list of comma separated items,
