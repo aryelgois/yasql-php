@@ -123,17 +123,17 @@ This class wrapps others, to make them easier to use.
 - _static_ **build(** [string] $root , [string] $output , [string] $config [, [string] $vendors] **)**
 
   Use this method to build your databases into a specific directory.  
-  (see **Builder**)
+  _(see [Builder])_
 
 - _static_ **generate(** [string] $yasql \[, [int] $indent \] **)**
 
   Use this to generate the SQL from a YASQL and get the result in a string.  
-  (see **Generator**)
+  _(see [Generator])_
 
 - _static_ **parse(** [string] $yasql **)**
 
   Use it to dump the parsed data from a YASQL. Basically, good for debugging.  
-  (see **Parser**)
+  _(see [Parser])_
 
 
 ## Parser
