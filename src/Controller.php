@@ -14,27 +14,28 @@ namespace aryelgois\YaSql;
  *
  * @author Aryel Mota Góis
  * @license MIT
+ * @link https://www.github.com/aryelgois/yasql-php
  */
 class Controller
 {
     /**
      * Builds database schemas into a directory
      *
-     * @param string $root    Path to project root directory
      * @param string $output  Path to output directory
      * @param string $config  Path to config file
-     * @param string $vendors Path to vendors directory
+     * @param string $vendor  Path to vendors directory
+     * @param array  $vendors List of additional vendors to include
      */
     public static function build(
-        string $root,
         string $output,
         string $config,
-        string $vendor = null
+        string $vendor,
+        array  $vendors = null
     ) {
         $builder = new Builder($output, $vendor);
 
         try {
-            $builder->build($config, $root);
+            $builder->build($config, $vendors);
         }
         catch (Exception $e) {
             throw $e;

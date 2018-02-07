@@ -18,40 +18,76 @@ use Composer\Script\Event;
  *
  * @author Aryel Mota Góis
  * @license MIT
+ * @link https://www.github.com/aryelgois/yasql-php
  */
 class Composer
 {
     /**
      * Builds database schemas into a directory
      *
-     * @argument string $1 Path to output directory
-     * @argument string $2 Path to config file (default 'config/databases.yml')
+     * Arguments: (any order)
+     *
+     *    config=path/to/config_file.yml (default 'config/databases.yml')
+     *    output=path/to/output/         (default 'build/')
+     *    vendor=vendor/package          (multiple allowed)
      *
      * @param Event $event Composer run-script event
      */
     public static function build(Event $event)
     {
         $args = $event->getArguments();
-        if (empty($args)) {
-            echo "Usage:\n\n"
-               . "composer yasql-build -- OUTPUT_DIR [CONFIG_FILE]\n\n"
-               . "By default, CONFIG_FILE is 'config/databases.yml'\n";
-            die(1);
+        $config = null;
+        $output = null;
+        $vendors = [];
+
+        foreach ($args as $arg) {
+            $tokens = explode('=', $arg, 2);
+            if (count($tokens) == 1) {
+                throw new \InvalidArgumentException("Invalid argument '$arg'");
+            }
+            switch ($tokens[0]) {
+                case 'config':
+                    if ($config === null) {
+                        $config = $tokens[1];
+                    } else {
+                        throw new \LogicException("Repeated 'config' argument");
+                    }
+                    break;
+
+                case 'output':
+                    if ($output === null) {
+                        $output = $tokens[1];
+                    } else {
+                        throw new \LogicException("Repeated 'output' argument");
+                    }
+                    break;
+
+                case 'vendor':
+                    $vendors[] = $tokens[1];
+                    break;
+
+                default:
+                    $message = "Unknown argument '$tokens[0]' in '$arg'";
+                    throw new \DomainException($message);
+                    break;
+            }
         }
 
         Controller::build(
-            getcwd(),
-            $args[0],
-            $args[1] ?? 'config/databases.yml',
-            self::getVendorDir($event)
+            $output ?? 'build/',
+            $config ?? 'config/databases.yml',
+            self::getVendorDir($event),
+            $vendors
         );
     }
 
     /**
      * Generates the SQL from a YASQL file
      *
-     * @argument string $1 Path to YASQL file
-     * @argument int    $2 How many spaces per indentation level
+     * Arguments:
+     *
+     *    string $1 Path to YASQL file
+     *    int    $2 How many spaces per indentation level
      *
      * @param Event $event Composer run-script event
      */
@@ -60,7 +96,7 @@ class Composer
         $args = $event->getArguments();
         if (empty($args)) {
             echo "Usage:\n\n"
-               . "composer yasql-generate -- YASQL_FILE [INDENTATION]\n\n"
+               . "    composer yasql-generate -- YASQL_FILE [INDENTATION]\n\n"
                . "By default, INDENTATION is 2\n";
             die(1);
         }

@@ -31,6 +31,7 @@ use Symfony\Component\Yaml\Yaml;
  *
  * @author Aryel Mota Góis
  * @license MIT
+ * @link https://www.github.com/aryelgois/yasql-php
  */
 abstract class Populator
 {
@@ -49,30 +50,13 @@ abstract class Populator
     protected $filename;
 
     /**
-     * Root directory to load files
-     *
-     * @var string
-     */
-    protected $root;
-
-    /**
-     * Creates a new Populator object
-     *
-     * @param string $root Root directory to load files
-     */
-    public function __construct(string $root)
-    {
-        $this->root = $root;
-    }
-
-    /**
      * Loads a YAML file to be processed
      *
      * @param string $file Path to YAML source file
      */
     public function load(string $file)
     {
-        $this->data = Yaml::parse(file_get_contents($this->root . '/' . $file));
+        $this->data = Yaml::parse(file_get_contents($file));
         $this->filename = basename($file);
     }
 
