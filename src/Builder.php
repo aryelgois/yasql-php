@@ -38,13 +38,13 @@ class Builder
      *
      * @var string|false
      */
-    protected $vendors;
+    protected $vendor;
 
     /**
      * Creates a new Builder object
      *
-     * @param string $output  Where files will be stored
-     * @param string $vendors Path to vendors directory
+     * @param string $output Where files will be stored
+     * @param string $vendor Path to vendors directory
      *
      * @throws \RuntimeException Can not create output directory
      */
@@ -59,13 +59,13 @@ class Builder
         }
 
         $this->output = realpath($output);
-        $this->vendors = realpath($vendors ?? 'vendor');
+        $this->vendor = realpath($vendor ?? 'vendor');
 
         $this->log = 'Build start: ' . date('c') . "\n"
             . "Output: $this->output\n\n";
 
-        if ($this->vendors === false) {
-            $this->log .= "N: Could not find vendors dir\n\n";
+        if ($this->vendor === false) {
+            $this->log .= "N: Could not find vendor dir\n\n";
         }
     }
 
@@ -135,7 +135,7 @@ class Builder
             $this->log .= "Files generated:\n$generated";
         }
 
-        if ($this->vendors === false) {
+        if ($this->vendor === false) {
             return;
         }
         foreach ($config['vendors'] ?? [] as $vendor => $vendor_configs) {
