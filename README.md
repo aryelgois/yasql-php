@@ -213,14 +213,14 @@ covered by YASQL specification. Its content is appended to the generated sql.
 
 ## Populator
 
-A helper class for **Builder**. Use it to generate `INSERT INTO` statements to
+A helper class for [Builder]. Use it to generate `INSERT INTO` statements to
 populate your databases.
 
 This class is _abstract_, so you have to write a class that extends it. The
 reason is that the YAML with the data might be in a arbitrary layout, depending
 on your database schema.
 
-To use it, you need a special post in the builder config:
+To use it, you need a special post in the [builder config][config file]:
 
 Example from [aryelgois/databases]:
 
@@ -234,9 +234,9 @@ databases:
           - data/address/source/Brazil.yml
 ```
 
-The post must map to a sequence, and the item is a map of:
+The post must map to a sequence, and the desired item is a map of:
 
-- `call`: a fully qualified class that extends **Populator**, autoloadable by
+- `call`: a fully qualified class that extends [Populator], autoloadable by
   Composer
 - `with`: path to a YAML with the data to be processed. It can be a sequence
 
