@@ -244,7 +244,7 @@ The post must map to a sequence, and the desired item is a map of:
 ## Utils
 
 There is also a class with utility methods. They are used internally and can be
-used by whoever require this package.
+used by whoever requires this package.
 
 - **arrayAppendLast(** [array] $array , [string] $last \[, [string] $others \] **)**
 
