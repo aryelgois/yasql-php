@@ -226,12 +226,12 @@ Example from [aryelgois/databases]:
 
 ```yml
 databases:
-  - path: data/address.yml
+  - path: ../data/address.yml
     post:
-      - data/address/populate_countries.sql
+      - ../data/address/populate_countries.sql
       - call: aryelgois\Databases\AddressPopulator
         with:
-          - data/address/source/Brazil.yml
+          - ../data/address/source/Brazil.yml
 ```
 
 The post must map to a sequence, and the desired item is a map of:
