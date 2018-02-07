@@ -74,7 +74,6 @@ class Composer
         }
 
         Controller::build(
-            getcwd(),
             $output ?? 'build/',
             $config ?? 'config/databases.yml',
             self::getVendorDir($event),

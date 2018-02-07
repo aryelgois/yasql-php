@@ -21,14 +21,12 @@ class Controller
     /**
      * Builds database schemas into a directory
      *
-     * @param string $root    Path to project root directory
      * @param string $output  Path to output directory
      * @param string $config  Path to config file
      * @param string $vendor  Path to vendors directory
      * @param array  $vendors List of additional vendors to include
      */
     public static function build(
-        string $root,
         string $output,
         string $config,
         string $vendor,
@@ -37,7 +35,7 @@ class Controller
         $builder = new Builder($output, $vendor);
 
         try {
-            $builder->build($config, $root);
+            $builder->build($config, $vendors);
         }
         catch (Exception $e) {
             throw $e;
