@@ -48,8 +48,12 @@ class Builder
      *
      * @throws \RuntimeException Can not create output directory
      */
-    public function __construct(string $output, string $vendors = null)
+    public function __construct(string $output = null, string $vendor = null)
     {
+        if ($output === null) {
+            $output = getcwd() . '/build';
+        }
+
         if (!is_dir($output) && !mkdir($output, 0775, true)) {
             throw new \RuntimeException('Can not create output directory');
         }
