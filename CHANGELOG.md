@@ -13,14 +13,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - GitHub link
 - Changelog file
+- README Index
+- Default build output directory
 
 ### Changed
+- API
 
 ### Deprecated
 
 ### Removed
+- .gitattributes, that made composer.lock binary
+- `Populator->root` property
 
 ### Fixed
+- Issue [#2][issues/2]
+- Typo
 
 ### Security
 
@@ -89,5 +96,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 [0.1]: https://github.com/aryelgois/yasql-php/compare/271219190ff3dc0955b682a9444e52f6cca7424a...v0.1
 
 [issues/1]: https://github.com/aryelgois/yasql-php/issues/1
+[issues/2]: https://github.com/aryelgois/yasql-php/issues/2
 
 [YAML]: http://yaml.org/
