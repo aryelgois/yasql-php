@@ -100,7 +100,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Test database and script
 
 
-[Unreleased]: https://github.com/aryelgois/yasql-php/compare/v0.4.0-pre...develop
+[Unreleased]: https://github.com/aryelgois/yasql-php/compare/v0.4.0-alpha...develop
 [0.4.0-alpha]: https://github.com/aryelgois/yasql-php/compare/v0.3.1...v0.4.0-alpha
 [0.3.1]: https://github.com/aryelgois/yasql-php/compare/v0.3...v0.3.1
 [0.3]: https://github.com/aryelgois/yasql-php/compare/v0.2...v0.3
