@@ -24,13 +24,15 @@ class Controller
      * @param string $root    Path to project root directory
      * @param string $output  Path to output directory
      * @param string $config  Path to config file
-     * @param string $vendors Path to vendors directory
+     * @param string $vendor  Path to vendors directory
+     * @param array  $vendors List of additional vendors to include
      */
     public static function build(
         string $root,
         string $output,
         string $config,
-        string $vendor = null
+        string $vendor,
+        array  $vendors = null
     ) {
         $builder = new Builder($output, $vendor);
 
