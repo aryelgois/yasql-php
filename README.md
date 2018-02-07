@@ -44,10 +44,10 @@ following in your `composer.json`:
 }
 ```
 
-You also need a config file for the builder command. The default is to place it
-in `config/databases.yml`, but you can choose another place or have more than
+You also need a [config file] for the builder command. The default is to place
+it in `config/databases.yml`, but you can choose another place or have more than
 one configuration.  
-_(see specifications in **Builder**)_
+_(see [Builder] specifications)_
 
 
 # Usage
