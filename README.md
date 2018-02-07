@@ -120,7 +120,7 @@ _(see how to configure the commands in [Setup])_
 
 This class wrapps others, to make them easier to use.
 
-- _static_ **build(** [string] $root , [string] $output , [string] $config [, [string] $vendors] **)**
+- _static_ **build(** [string] $output , [string] $config , [string] $vendor \[, [array] $vendors \] **)**
 
   Use this method to build your databases into a specific directory.  
   _(see [Builder])_
@@ -164,13 +164,13 @@ This class wrapps others, to make them easier to use.
 
 ## Builder
 
-- **__construct(** \[ [string] $output \[, [string] $vendors \] \] **)**
+- **__construct(** \[ [string] $output \[, [string] $vendor \] \] **)**
 
   Creates a new Builder object. Databases will go into `$output`, and vendors
   are searched in `$vendors`. Both paths can be absolut or relative, and default
   to `build/` and `vendor/` in the current working directory, respectively.
 
-- **build(** [string] $config **)**
+- **build(** [string] $config \[, [array] $vendors \] **)**
 
   Generates a list of databases listed in `$config` file into the object's
   output directory.
