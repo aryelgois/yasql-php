@@ -52,7 +52,7 @@ _(see [Builder] specifications)_
 
 # Usage
 
-#### yasql-build
+### yasql-build
 
 Create databases following the [YASQL][aryelgois/yasql] schema and add them in
 your builder configuration (`databases.yml`). Then run the following command
@@ -74,7 +74,7 @@ It will create `.sql` files in the output directory, so you can import them into
 your sql server.
 
 
-#### yasql-generate
+### yasql-generate
 
 If you only want to generate the SQL from one YASQL schema, run the following
 command:
