@@ -54,24 +54,32 @@ _(see [Builder] specifications)_
 
 ### yasql-build
 
-Create databases following the [YASQL][aryelgois/yasql] schema and add them in
-your builder configuration (`databases.yml`). Then run the following command
-inside your project root:
+First, create databases following the [YASQL][aryelgois/yasql] schema and list
+them in your [config file]. Then run the following command in your project root:
 
-`composer yasql-build -- path/to/output [path/to/config_file.yml]`
+```sh
+composer yasql-build -- [ config=path/to/config_file.yml ]
+                        [ output=path/to/output/ ]
+                        [ vendor=vendor/package ]
+```
 
-> **NOTE**
->
-> - All paths (inside the config file and in the previous command) are relative
->   to your project root
->
-> - If you use the default config file location `config/databases.yml`, it is
->   optional
->
-> - It might be a good idea to add the output directory to your .gitignore
+- `config`: Lists YASQL databases to be built and vendors to include
+- `output`: Directory where files are generated
+- `vendor`: Additional vendor to include (using default config file location)
 
-It will create `.sql` files in the output directory, so you can import them into
-your sql server.
+Notes:
+
+- Paths in the command line are relative to the project root
+- Paths in the config file are relative to the file itself
+- Absolut paths are absolut (they start with `/`)
+- Vendors are located in Composer's `vendor dir`
+- You can omit `config` for using the default `config/databases.yml`
+- You can omit `output` for using the default `build/`
+- You can add multiple `vendor` arguments
+- It might be a good idea to add the output directory to your .gitignore
+
+This command creates `.sql` files in the output directory, so you can import
+them into your sql server.
 
 
 ### yasql-generate
@@ -79,7 +87,7 @@ your sql server.
 If you only want to generate the SQL from one YASQL schema, run the following
 command:
 
-`composer yasql-generate -- path/to/yasql.yml [indentation]`
+`composer yasql-generate -- path/to/yasql.yml [ indentation ]`
 
 It will output to stdout, so you can add something like ` > output_database.sql`
 to write the result in a file. The indentation defaults to 2 spaces.
