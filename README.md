@@ -182,7 +182,7 @@ This class wrapps others, to make them easier to use.
 
 #### config file
 
-A YAML with the following keys: (all are optional)
+A [YAML] with the following keys: (all are optional)
 
 - `databases`: sequence of files with YASQL database schemas. It can be a
   string or a mapping of the YASQL path and a post sql (or a sequence of post
@@ -190,7 +190,8 @@ A YAML with the following keys: (all are optional)
 - `indentation`: used during the sql generation
 - `vendors`: a map of vendors installed by Composer to config files inside them.
   It can be a string (for a single config) or a sequence of paths. They are
-  relative to the vendor package root
+  relative to the vendor package root. Using `~` (yaml null) denotes the default
+  [config file]
 
 Example:
 
@@ -203,7 +204,7 @@ databases:
 indentation: 4
 
 vendors:
-  someone/package: config/databases.yml # could be ~ (yaml null) for the default
+  someone/package: config/databases.yml
 ```
 
 The post file is useful for pre populated rows or to apply sql commands not
@@ -279,3 +280,5 @@ used by whoever require this package.
 [array]: https://secure.php.net/manual/en/language.types.array.php
 [int]: https://secure.php.net/manual/en/language.types.integer.php
 [string]: https://secure.php.net/manual/en/language.types.string.php
+
+[YAML]: http://yaml.org/
