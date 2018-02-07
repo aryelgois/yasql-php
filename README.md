@@ -154,8 +154,8 @@ This class wrapps others, to make them easier to use.
 
 - **__construct(** [Parser][parser-class] $parser \[, [int] $indent \] **)**
 
-  Produces SQL to create the database. It asks for a Parser to ensure the data
-  is valid.
+  Produces SQL that generates a database. It asks for a Parser object to ensure
+  the data is valid.
 
 - **output()**
 
