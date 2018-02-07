@@ -72,23 +72,25 @@ class Builder
     /**
      * Builds databases in a config file
      *
-     * @param string $config Path to YAML with build configurations
-     * @param string $root   From where to solve the paths
+     * @param string $config  Path to YAML with build configurations
+     * @param array  $vendors List of additional vendors to include
+     *                        (using the default config file location)
      */
-    public function build(string $config, string $root = null)
+    public function build(string $config, array $vendors = null)
     {
-        $root = $root ?? getcwd();
-
-        $config = $root . '/' . $config;
-        $this->log .= "Load config file $config\n";
-        $config = Yaml::parse(file_get_contents($config));
+        $config_path = realpath($config);
+        $this->log .= "Load config file '$config_path'\n";
+        $config = Yaml::parse(file_get_contents($config_path));
         $indent = $config['indentation'] ?? null;
 
         $databases = $config['databases'] ?? [];
         if (!empty($databases)) {
             $generated = '';
             foreach ($config['databases'] as $database) {
-                $path = $root . '/' . ($database['path'] ?? $database);
+                $path = $database['path'] ?? $database;
+                if ($path[0] !== '/') {
+                    $path = dirname($config_path) . '/' . $path;
+                }
                 $file = realpath($path);
                 if ($file === false) {
                     $this->log .= "E: Database '$path' not found\n";
@@ -113,7 +115,9 @@ class Builder
                                 . "'\n--\n\n" . trim($obj->run()) . "\n\n";
                         }
                     } else {
-                        $post = $root . '/' . $post;
+                        if ($post[0] !== '/') {
+                            $post = dirname($config_path) . '/' . $post;
+                        }
                         $post_file = realpath($post);
                         if ($post_file === false) {
                             $this->log .= "W: Post file '$post' not found\n";
@@ -138,7 +142,11 @@ class Builder
         if ($this->vendor === false) {
             return;
         }
-        foreach ($config['vendors'] ?? [] as $vendor => $vendor_configs) {
+        $vendors = array_merge_recursive(
+            array_fill_keys($vendors ?? [], null),
+            $config['vendors'] ?? []
+        );
+        foreach ($vendors as $vendor => $vendor_configs) {
             $this->log .= "\nSwitch to vendor $vendor\n\n";
 
             if (is_null($vendor_configs)) {
@@ -146,10 +154,8 @@ class Builder
             }
 
             foreach ((array) $vendor_configs as $vendor_config) {
-                $this->build(
-                    $vendor_config ?? 'config/databases.yml',
-                    $this->vendors . '/' . $vendor
-                );
+                $this->build("$this->vendor/$vendor/"
+                    . ($vendor_config ?? 'config/databases.yml'));
             }
         }
     }
