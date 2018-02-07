@@ -107,7 +107,7 @@ class Builder
                                 . Populator::class . "\n";
                             continue;
                         }
-                        $obj = new $class($root);
+                        $obj = new $class();
                         $post_sql = '';
                         foreach ((array) $post['with'] as $with) {
                             $obj->load($with);
