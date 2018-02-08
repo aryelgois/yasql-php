@@ -182,7 +182,7 @@ This class wrapps others, to make them easier to use.
   Retrieves log information from the build process.
 
 
-#### config file
+### config file
 
 A [YAML] with the following keys: (all are optional)
 
