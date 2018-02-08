@@ -85,7 +85,8 @@ class Builder
      */
     public function build(string $config, array $vendors = null)
     {
-        if ($config !== '') {
+        $config_path = realpath($config);
+        if ($config !== '' && $config_path !== false) {
             $config_path = realpath($config);
             if (in_array($config_path, $this->track)) {
                 $this->log .= "Skiping repeated config file '$config_path'\n";
