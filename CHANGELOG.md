@@ -10,19 +10,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+
+## [0.4.0] - 2018-02-07
+
 ### Added
 - Option not to build with a local config file, but with vendor's
 
-### Changed
-
-### Deprecated
-
-### Removed
-
 ### Fixed
 - Database example
-
-### Security
 
 
 ## [0.4.0-alpha] - 2018-02-07
@@ -102,7 +97,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Test database and script
 
 
-[Unreleased]: https://github.com/aryelgois/yasql-php/compare/v0.4.0-alpha...develop
+[Unreleased]: https://github.com/aryelgois/yasql-php/compare/v0.4.0...develop
+[0.4.0]: https://github.com/aryelgois/yasql-php/compare/v0.4.0-alpha...v0.4.0
 [0.4.0-alpha]: https://github.com/aryelgois/yasql-php/compare/v0.3.1...v0.4.0-alpha
 [0.3.1]: https://github.com/aryelgois/yasql-php/compare/v0.3...v0.3.1
 [0.3]: https://github.com/aryelgois/yasql-php/compare/v0.2...v0.3
