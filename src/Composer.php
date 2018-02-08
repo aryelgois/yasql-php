@@ -75,7 +75,7 @@ class Composer
             }
         }
 
-        if ($config == '' && count($vendors) == 0) {
+        if ($config === '' && count($vendors) == 0) {
             echo "Nothing to do.\n";
             die(1);
         }
