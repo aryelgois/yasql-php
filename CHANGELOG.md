@@ -23,6 +23,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Security
 
 
+## [0.4.2] - 2018-02-07
+
+### Fixed
+- When config file does not exist
+
+
 ## [0.4.1] - 2018-02-07
 
 ### Fixed
@@ -115,7 +121,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Test database and script
 
 
-[Unreleased]: https://github.com/aryelgois/yasql-php/compare/v0.4.1...develop
+[Unreleased]: https://github.com/aryelgois/yasql-php/compare/v0.4.2...develop
+[0.4.2]: https://github.com/aryelgois/yasql-php/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/aryelgois/yasql-php/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/aryelgois/yasql-php/compare/v0.4.0-alpha...v0.4.0
 [0.4.0-alpha]: https://github.com/aryelgois/yasql-php/compare/v0.3.1...v0.4.0-alpha
