@@ -104,7 +104,7 @@ This package provides some classes to parse YASQL and generate SQL. They are
 under the namespace `aryelgois\YaSql`.
 
 
-## Composer
+## [Composer][Composer-class]
 
 Provides Composer scripts to use this package from the command line.  
 _(see how to configure the commands in [Setup])_
@@ -118,7 +118,7 @@ _(see how to configure the commands in [Setup])_
   It accepts arguments described in [yasql-generate].
 
 
-## Controller
+## [Controller][Controller-class]
 
 This class wrapps others, to make them easier to use.
 
@@ -138,7 +138,7 @@ This class wrapps others, to make them easier to use.
   _(see [Parser])_
 
 
-## Parser
+## [Parser][Parser-class]
 
 - **__construct(** [string] $yasql **)**
 
@@ -152,9 +152,9 @@ This class wrapps others, to make them easier to use.
   Retrieves the parsed data in a multidimensional array.
 
 
-## Generator
+## [Generator][Generator-class]
 
-- **__construct(** [Parser][parser-class] $parser [, [int] $indent ] **)**
+- **__construct(** [Parser][Parser-class] $parser [, [int] $indent ] **)**
 
   Produces SQL that generates a database. It asks for a Parser object to ensure
   the data is valid.
@@ -164,7 +164,7 @@ This class wrapps others, to make them easier to use.
   Retrieves the generated SQL in a multi line string.
 
 
-## Builder
+## [Builder][Builder-class]
 
 - **__construct(** [ [string] $output [, [string] $vendor ] ] **)**
 
@@ -213,7 +213,7 @@ The post file is useful for pre populated rows or to apply sql commands not
 covered by YASQL specification. Its content is appended to the generated sql.
 
 
-## Populator
+## [Populator][Populator-class]
 
 A helper class for [Builder]. Use it to generate `INSERT INTO` statements to
 populate your databases.
@@ -243,7 +243,7 @@ The post must map to a sequence, and the desired item is a map of:
 - `with`: path to a YAML with the data to be processed. It can be a sequence
 
 
-## Utils
+## [Utils][Utils-class]
 
 There is also a class with utility methods. They are used internally and can be
 used by whoever requires this package.
@@ -272,7 +272,13 @@ used by whoever requires this package.
 [Populator]: #populator
 [Utils]: #utils
 
-[parser-class]: src/Parser.php
+[Composer-class]: src/Composer.php
+[Controller-class]: src/Controller.php
+[Parser-class]: src/Parser.php
+[Generator-class]: src/Generator.php
+[Builder-class]: src/Builder.php
+[Populator-class]: src/Populator.php
+[Utils-class]: src/Utils.php
 
 [aryelgois/yasql]: https://github.com/aryelgois/yasql
 [aryelgois/databases]: https://github.com/aryelgois/databases
