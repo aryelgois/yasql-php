@@ -103,12 +103,16 @@ class Composer
         $args = $event->getArguments();
         if (empty($args)) {
             echo "Usage:\n\n"
-               . "    composer yasql-generate -- YASQL_FILE [INDENTATION]\n\n"
-               . "By default, INDENTATION is 2\n";
+                . "    composer yasql-generate -- YASQL_FILE [INDENTATION]\n\n"
+                . "By default, INDENTATION is 2\n";
             die(1);
         }
 
-        echo Controller::generate(file_get_contents($args[0]), $args[1] ?? 2);
+        echo Controller::generate(
+            file_get_contents($args[0]),
+            null,
+            $args[1] ?? 2
+        );
     }
 
     /**

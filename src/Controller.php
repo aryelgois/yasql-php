@@ -36,8 +36,7 @@ class Controller
 
         try {
             $builder->build($config, $vendors);
-        }
-        catch (Exception $e) {
+        } catch (\Exception $e) {
             throw $e;
         } finally {
             echo $builder->getLog();
@@ -48,13 +47,17 @@ class Controller
      * Generates the SQL from a YASQL
      *
      * @param string $yasql  A string following YAML Ain't SQL specifications
+     * @param string $name   Overwrite database's name
      * @param int    $indent How many spaces per indentation level
      *
      * @return string
      */
-    public static function generate(string $yasql, int $indent = null)
-    {
-        $model = new Parser($yasql);
+    public static function generate(
+        string $yasql,
+        string $name = null,
+        int $indent = null
+    ) {
+        $model = new Parser($yasql, $name);
         $view = new Generator($model, $indent);
         return $view->output();
     }
@@ -63,12 +66,13 @@ class Controller
      * Parses a YASQL and returns the parsed data
      *
      * @param string $yasql A string following YAML Ain't SQL specifications
+     * @param string $name   Overwrite database's name
      *
      * @return array
      */
-    public static function parse(string $yasql)
+    public static function parse(string $yasql, string $name = null)
     {
-        $parser = new Parser($yasql);
+        $parser = new Parser($yasql, $name);
         return $parser->getData();
     }
 }
