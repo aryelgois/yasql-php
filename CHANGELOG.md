@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+
+## [0.5.0] - 2018-03-26
+
 ### Added
 - Link for each class in API
 - Database names can be overwritten in config file
@@ -17,14 +20,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
 - Reduce `config file` section header level
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 - Indentation
-
-### Security
 
 
 ## [0.4.2] - 2018-02-07
@@ -125,7 +122,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Test database and script
 
 
-[Unreleased]: https://github.com/aryelgois/yasql-php/compare/v0.4.2...develop
+[Unreleased]: https://github.com/aryelgois/yasql-php/compare/v0.5.0...develop
+[0.5.0]: https://github.com/aryelgois/yasql-php/compare/v0.4.2...v0.5.0
 [0.4.2]: https://github.com/aryelgois/yasql-php/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/aryelgois/yasql-php/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/aryelgois/yasql-php/compare/v0.4.0-alpha...v0.4.0
