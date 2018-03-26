@@ -192,8 +192,8 @@ A [YAML] with the following keys: (all are optional)
 - `indentation`: used during the sql generation
 - `vendors`: a map of vendors installed by Composer to config files inside them.
   It can be a string (for a single config) or a sequence of paths. They are
-  relative to the vendor package root. Using `~` (yaml null) denotes the default
-  [config file]
+  relative to the vendor package root. Using `~` (yaml null) denotes the
+  [default config file path][Setup]
 
 Example:
 
