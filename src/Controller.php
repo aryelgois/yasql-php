@@ -36,8 +36,7 @@ class Controller
 
         try {
             $builder->build($config, $vendors);
-        }
-        catch (Exception $e) {
+        } catch (\Exception $e) {
             throw $e;
         } finally {
             echo $builder->getLog();
