@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 - Link for each class in API
+- Database names can be overwritten in config file
 
 ### Changed
 - Reduce `config file` section header level

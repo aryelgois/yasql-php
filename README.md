@@ -187,8 +187,14 @@ This class wrapps others, to make them easier to use.
 A [YAML] with the following keys: (all are optional)
 
 - `databases`: sequence of files with YASQL database schemas. It can be a
-  string or a mapping of the YASQL path and a post sql (or a sequence of post
-  files)
+  string or a mapping of the YASQL `path` and a `post` sql (or a sequence of
+  post files)
+
+  Also, a `name` can be defined to overwrite the database's name. It is useful
+  when you want to combine multiple database schemas in a single database. Just
+  be careful with conflicting tables. Also note that external foreigns require
+  special care in the file order that you run in the sql server
+
 - `indentation`: used during the sql generation
 - `vendors`: a map of vendors installed by Composer to config files inside them.
   It can be a string (for a single config) or a sequence of paths. They are
@@ -202,6 +208,7 @@ databases:
   - ../tests/example.yml
   - path: ../data/mydatabase.yml
     post: ../data/mydatabase_populate.sql
+    name: AwesomeExample
 
 indentation: 4
 

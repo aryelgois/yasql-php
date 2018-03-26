@@ -108,7 +108,11 @@ class Composer
             die(1);
         }
 
-        echo Controller::generate(file_get_contents($args[0]), $args[1] ?? 2);
+        echo Controller::generate(
+            file_get_contents($args[0]),
+            null,
+            $args[1] ?? 2
+        );
     }
 
     /**

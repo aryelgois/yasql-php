@@ -75,6 +75,7 @@ class Parser
      * Creates a new Parser object
      *
      * @param string $yasql A string following YAML Ain't SQL specifications
+     * @param string $name  Overwrite database's name
      *
      * @throws \InvalidArgumentException $yasql is not a mapping
      * @throws \RuntimeException         Missing Database name
@@ -88,9 +89,13 @@ class Parser
      * @throws \LengthException          Column is empty
      * @throws \LogicException           Multiple PRIMARY KEY indexes
      */
-    public function __construct(string $yasql)
+    public function __construct(string $yasql, string $name = null)
     {
         $data = Yaml::parse($yasql);
+
+        if ($name !== null) {
+            $data['database']['name'] = $name;
+        }
 
         if (!is_array($data)) {
             throw new \InvalidArgumentException('YASQL must be a mapping');

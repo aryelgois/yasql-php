@@ -113,7 +113,11 @@ class Builder
                     $this->log .= "E: Database '$path' not found\n";
                     continue;
                 }
-                $sql = Controller::generate(file_get_contents($file), $indent);
+                $sql = Controller::generate(
+                    file_get_contents($file),
+                    $database['name'] ?? null,
+                    $indent
+                );
 
                 $post_list = (array) ($database['post'] ?? []);
                 foreach ($post_list as $post) {
