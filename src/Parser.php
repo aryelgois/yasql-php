@@ -280,7 +280,7 @@ class Parser
                 $result = self::extractKeyword($query, 'UNIQUE( KEY|)');
                 if ($result !== false) {
                     $query = $result;
-                    $indexes[$table]['UNIQUE'][] = [$column];
+                    $indexes[$table]['UNIQUE'][] = $column;
                 }
 
                 $result = self::extractKeyword($query, '(INDEX|KEY)');
