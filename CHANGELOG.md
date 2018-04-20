@@ -23,6 +23,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Security
 
 
+## [0.5.1] - 2018-04-19
+
+### Fixed
+- INDEX key defined in the column was not working
+
+
 ## [0.5.0] - 2018-03-26
 
 ### Added
@@ -134,7 +140,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Test database and script
 
 
-[Unreleased]: https://github.com/aryelgois/yasql-php/compare/v0.5.0...develop
+[Unreleased]: https://github.com/aryelgois/yasql-php/compare/v0.5.1...develop
+[0.5.1]: https://github.com/aryelgois/yasql-php/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/aryelgois/yasql-php/compare/v0.4.2...v0.5.0
 [0.4.2]: https://github.com/aryelgois/yasql-php/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/aryelgois/yasql-php/compare/v0.4.0...v0.4.1
