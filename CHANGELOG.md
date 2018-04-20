@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+- `ALTER TABLE` syntax to add INDEX keys
+
 
 ## [0.5.1] - 2018-04-19
 

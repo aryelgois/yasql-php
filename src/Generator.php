@@ -101,7 +101,7 @@ class Generator
                         case 'INDEX':
                         case 'UNIQUE':
                             foreach ($index as $column) {
-                                $id[] = $in . "ADD $key KEY (`"
+                                $id[] = $in . "ADD $key (`"
                                     . implode('`, `', (array) $column) . '`)';
                             }
                             break;
