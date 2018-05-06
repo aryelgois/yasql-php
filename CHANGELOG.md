@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 - Undo shortening `ADD UNIQUE KEY` from fix in `0.5.2`
+- Comparison operators
 
 ### Security
 

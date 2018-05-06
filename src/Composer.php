@@ -42,7 +42,7 @@ class Composer
 
         foreach ($args as $arg) {
             $tokens = explode('=', $arg, 2);
-            if (count($tokens) == 1 && $arg[0] !== '-') {
+            if (count($tokens) === 1 && $arg[0] !== '-') {
                 throw new \InvalidArgumentException("Invalid argument '$arg'");
             }
             switch ($tokens[0]) {
@@ -75,7 +75,7 @@ class Composer
             }
         }
 
-        if ($config === '' && count($vendors) == 0) {
+        if ($config === '' && count($vendors) === 0) {
             echo "Nothing to do.\n";
             die(1);
         }

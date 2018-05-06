@@ -169,13 +169,13 @@ class Parser
             }
 
             $table = array_shift($identifiers);
-            if ($id_keys[$key] == 'single' && isset($indexes[$table][$key])) {
+            if ($id_keys[$key] === 'single' && isset($indexes[$table][$key])) {
                 $message = 'Duplicated composite for single column key on table'
                     . " `$table`";
                 throw new \LogicException($message);
             }
 
-            if ($id_keys[$key] == 'multiple') {
+            if ($id_keys[$key] === 'multiple') {
                 $indexes[$table][$key][] = $identifiers;
             } else {
                 $indexes[$table][$key] = $identifiers;
@@ -206,7 +206,7 @@ class Parser
                  * Pre validation
                  */
                 $query = trim($query);
-                if (strlen($query) == 0) {
+                if (strlen($query) === 0) {
                     $message = "Missing column definition in `$table`.`$column`";
                     throw new \LengthException($message);
                 }
@@ -320,7 +320,7 @@ class Parser
                     $key
                 );
                 if ($result !== false) {
-                    $key = ($key[1][0] == 'NULLABLE')
+                    $key = ($key[1][0] === 'NULLABLE')
                         ? 'NULL'
                         : $key[1][0];
                     $query = $result . ' ' . $key;
@@ -337,7 +337,7 @@ class Parser
                  * Validation
                  */
                 $query = trim($query);
-                if (strlen($query) == 0) {
+                if (strlen($query) === 0) {
                     $message = "Column `$table`.`$column` is empty";
                     throw new \LengthException($message);
                 }
