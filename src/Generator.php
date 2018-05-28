@@ -100,6 +100,9 @@ class Generator
 
                         case 'INDEX':
                         case 'UNIQUE':
+                            if ($key === 'UNIQUE') {
+                                $key = 'UNIQUE KEY';
+                            }
                             foreach ($index as $column) {
                                 $id[] = $in . "ADD $key (`"
                                     . implode('`, `', (array) $column) . '`)';

@@ -1,3 +1,5 @@
+# YASQL-PHP
+
 Index:
 
 - [Intro]
@@ -15,6 +17,7 @@ Index:
     - [config file]
   - [Populator]
   - [Utils]
+- [Changelog]
 
 
 # Intro
@@ -262,6 +265,9 @@ used by whoever requires this package.
   and a semicolon at the last item.
 
 
+# [Changelog]
+
+
 [Setup]: #setup
 [Intro]: #intro
 [Install]: #install
@@ -279,6 +285,7 @@ used by whoever requires this package.
 [Populator]: #populator
 [Utils]: #utils
 
+[Changelog]: CHANGELOG.md
 [Composer-class]: src/Composer.php
 [Controller-class]: src/Controller.php
 [Parser-class]: src/Parser.php
